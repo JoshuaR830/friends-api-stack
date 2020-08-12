@@ -40,6 +40,6 @@ jobs:
     - name: Update stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
-        name: party-games
+        name: adventures-of-wilbur
         template: template.yaml
         no-fail-on-empty-changeset: 1
