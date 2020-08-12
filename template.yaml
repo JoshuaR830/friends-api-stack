@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  AdventuresOfWilburRandomImageFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: adventures-of-wilbur-functions
+        S3Key: AdventuresOfWilburRandomImageFunctionCode
+      Description: Get a random image of Wilbur
+      FunctionName: AdventuresOfWilburRandomImageFunction
+      Handler: AdventuresOfWilburRandomImageFunction::AdventuresOfWilburRandomImageFunction.Function:FunctionHandlerAsync
+      Role:
+        Fn::GetAtt:
+          - AdventuresOfWilburFunctionRole
+          - Arn
+      Runtime: dotnetcore3.1
+
+  AdventuresOfWilburImageTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "ImageId"
+          AttributeType: "N"
+      BillingMode: PROVISIONED
+      KeySchema:
+        -
+          AttributeName: "ImageId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: "AdventuresOfWilburImageTable"
+
+  AdventuresOfWilburFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Description: IAM role for the adventures of Wilbur image functions
+      Path: /
+      Policies:
+        - PolicyName: AWSLambdaBasicExecutionRole
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+        - PolicyName: ReadWriteTable
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:UpdateItem'
+                Resource: 
+                  - 'arn:aws:dynamodb:*:*:table/AdventuresOfWilburImageTable'
+        - PolicyName: AmazonS3FullAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource:
+                  - 'arn:aws:s3:::exchange-data-raw'
+                  - 'arn:aws:s3:::Exchange-data-raw/*'
