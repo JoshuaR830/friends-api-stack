@@ -15,6 +15,46 @@ Resources:
           - Arn
       Runtime: dotnetcore3.1
 
+  AdventuresOfWilburApiPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: AdventuresOfWilburRandomImageFunction
+      Principal: 'apigateway.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
+
+  AdventuresOfWilburResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt
+        - AdventuresOfWilburRestApi
+        - RootResourceId
+      PathPart: '{proxy+}'
+      RestApiId: !Ref AdventuresOfWilburRestApi
+
+  AdventuresOfWilburResourceANY:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >-
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburRandomImageFunction.Arn}/invocations
+      RestApiId: !Ref AdventuresOfWilburRestApi
+      ResourceId: !Ref AdventuresOfWilburResource
+
+
+  AdventuresOfWilburRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      BinaryMediaTypes:
+        - "image/png"
+        - "image/jpg"
+      Description: "An API for getting images from S3 with a lambda"
+      Name: AdventuresOfWilburRestApi
+
   AdventuresOfWilburImageTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -102,3 +142,10 @@ Resources:
                 Resource:
                   - 'arn:aws:s3:::exchange-data-raw'
                   - 'arn:aws:s3:::Exchange-data-raw/*'
+        - PolicyName: ApiGatewayPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'lambda:InvokeFunction'
+                Resource: '*'
