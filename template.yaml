@@ -51,8 +51,7 @@ Resources:
               - "s3:GetObject"
             Effect: "Allow"
             Principal: "*"
-            Resource:
-              arn:aws:s3:::adventures-of-wilbur-images
+            Resource: "arn:aws:s3:::adventures-of-wilbur-images/*"
 
   AdventuresOfWilburFunctionRole:
     Type: AWS::IAM::Role
