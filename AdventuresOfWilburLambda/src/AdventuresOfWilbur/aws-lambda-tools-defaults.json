@@ -9,7 +9,8 @@
   "region": "",
   "configuration": "Release",
   "framework": "netcoreapp3.1",
-  "s3-prefix": "AdventuresOfWilbur/",
-  "template": "serverless.template",
-  "template-parameters": ""
+  "function-runtime": "dotnetcore3.1",
+  "function-memory-size": 256,
+  "function-timeout": 30,
+  "function-handler": "AdventuresOfWilbur::AdventuresOfWilbur.Function::FunctionHandlerAsync"
 }
