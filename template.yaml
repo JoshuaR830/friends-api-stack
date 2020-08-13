@@ -32,6 +32,28 @@ Resources:
         WriteCapacityUnits: 1
       TableName: "AdventuresOfWilburImageTable"
 
+  AdventuresOfWilburImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: adventures-of-wilbur-images
+    DeletionPolicy: Retain
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: adventures-of-wilbur-images
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Action:
+              - "s3:GetObject"
+            Effect: "Allow"
+            Principal: "*"
+            Resource:
+              arn:aws:s3:::adventures-of-wilbur-images
+
   AdventuresOfWilburFunctionRole:
     Type: AWS::IAM::Role
     Properties:
