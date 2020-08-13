@@ -20,8 +20,9 @@ namespace AdventuresOfWilbur
         /// <param name="input"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string FunctionHandlerAsync(string input, ILambdaContext context)
+        public string FunctionHandlerAsync(object input, ILambdaContext context)
         {
+            Console.WriteLine(input);
             var imageName = "WP_20160601_20_39_24_Pro.jpg";
             return $"BucketBaseUrl/{imageName}";
         }
