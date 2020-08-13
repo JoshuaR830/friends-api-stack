@@ -12,6 +12,7 @@ namespace AdventuresOfWilbur
 {
     public class Function
     {
+        private const string BucketBaseUrl = "https://adventures-of-wilbur-images.s3.eu-west-2.amazonaws.com/";
         
         /// <summary>
         /// A simple function that takes a string and does a ToUpper
@@ -21,7 +22,8 @@ namespace AdventuresOfWilbur
         /// <returns></returns>
         public string FunctionHandlerAsync(string input, ILambdaContext context)
         {
-            return input?.ToUpper();
+            var imageName = "WP_20160601_20_39_24_Pro.jpg";
+            return $"BucketBaseUrl/{imageName}";
         }
     }
 }
