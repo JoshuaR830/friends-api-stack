@@ -82,7 +82,7 @@ namespace AdventuresOfWilbur
                 
                 var imageUrl = $"{BucketBaseUrl}/{imageName}";
                 
-                var imageData = new ImageData(imageUrl, imageTitle, imageDescription, imageFriends);
+                var imageData = new ImageData(imageUrl, imageTitle, imageDescription, imageFriends, numberOfItems);
                 var serializedImageData = JsonConvert.SerializeObject(imageData);
                 
                 return new APIGatewayProxyResponse
