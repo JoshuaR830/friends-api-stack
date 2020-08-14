@@ -36,7 +36,9 @@ namespace AdventuresOfWilbur
                     TableName = "AdventuresOfWilburImageTable"
                 };
 
+                Console.WriteLine("Describing");
                 var description = await _dynamoDb.DescribeTableAsync(tableDescription);
+                Console.WriteLine("Yay");
                 var numberOfItems = description.Table.ItemCount;
                 Console.WriteLine($"Item count: {numberOfItems}");
                 
@@ -94,7 +96,7 @@ namespace AdventuresOfWilbur
                     Body = $"{BucketBaseUrl}/{imageName}"
                 };
             }
-            catch
+            catch(KeyNotFoundException)
             {
                 return new APIGatewayProxyResponse
                 {
