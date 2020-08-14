@@ -30,6 +30,8 @@ namespace AdventuresOfWilbur
             try
             {
                 var storyItem = int.Parse(input.QueryStringParameters["storyItemNumber"]);
+                var imageTime = input.QueryStringParameters["imageTime"];
+
                 Console.WriteLine(storyItem);
                 
                 var tableDescription = new DescribeTableRequest
@@ -37,18 +39,34 @@ namespace AdventuresOfWilbur
                     TableName = "AdventuresOfWilburImageTable"
                 };
 
+                
                 Console.WriteLine("Describing");
                 var description = await _dynamoDb.DescribeTableAsync(tableDescription);
                 Console.WriteLine("Yay");
-                var numberOfItems = description.Table.ItemCount;
+                int numberOfItems = int.Parse(description.Table.ItemCount.ToString());
                 Console.WriteLine($"Item count: {numberOfItems}");
+
+                int imageId = 1;
+                switch (imageTime)
+                {
+                    case "latest":
+                        imageId = numberOfItems;
+                        break;
+                    case "random":
+                        var rand = new Random();
+                        imageId = rand.Next(1, (numberOfItems + 1));
+                        break;
+                    default:
+                        imageId = storyItem;
+                        break;
+                }
                 
                 var getRequest = new GetItemRequest
                 {
                     TableName = "AdventuresOfWilburImageTable",
                     Key = new Dictionary<string, AttributeValue>
                     {
-                        {"ImageId", new AttributeValue{ N = storyItem.ToString() }}
+                        {"ImageId", new AttributeValue{ N = imageId.ToString() }}
                     },
                     ProjectionExpression = "#title, #description, #imageKey, #friends",
                     ExpressionAttributeNames = new Dictionary<string, string>
