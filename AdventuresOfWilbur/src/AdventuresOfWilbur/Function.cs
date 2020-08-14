@@ -1,44 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 using Amazon.Lambda.Core;
-using Amazon.Lambda.APIGatewayEvents;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace AdventuresOfWilbur
 {
-    public class Functions
+    public class Function
     {
+        private const string BucketBaseUrl = "https://adventures-of-wilbur-images.s3.eu-west-2.amazonaws.com/";
+        
         /// <summary>
-        /// Default constructor that Lambda will invoke.
+        /// A simple function that takes a string and does a ToUpper
         /// </summary>
-        public Functions()
+        /// <param name="input"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public string FunctionHandlerAsync(object input, ILambdaContext context)
         {
-        }
-
-
-        /// <summary>
-        /// A Lambda function to respond to HTTP Get methods from API Gateway
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns>The API Gateway response.</returns>
-        public APIGatewayProxyResponse Get(APIGatewayProxyRequest request, ILambdaContext context)
-        {
-            context.Logger.LogLine("Get Request\n");
-
-            var response = new APIGatewayProxyResponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Body = "Hello AWS Serverless",
-                Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
-            };
-
-            return response;
+            Console.WriteLine(input);
+            var imageName = "WP_20160601_20_39_24_Pro.jpg";
+            return $"BucketBaseUrl/{imageName}";
         }
     }
 }
