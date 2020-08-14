@@ -36,26 +36,32 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 60
 
-  # AdventuresOfWilburRandomImageFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Code:
-  #       S3Bucket: adventures-of-wilbur-functions
-  #       S3Key: AdventuresOfWilburRandomImageFunctionCode
-  #     Description: Get a random image of Wilbur
-  #     FunctionName: AdventuresOfWilburRandomImageFunction
-  #     Handler: AdventuresOfWilburRandomImageFunction::AdventuresOfWilburRandomImageFunction.Function:Get
-  #     Role:
-  #       Fn::GetAtt:
-  #         - AdventuresOfWilburFunctionRole
-  #         - Arn
-  #     Runtime: dotnetcore3.1
+  AdventuresOfWilburUploadFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: adventures-of-wilbur-functions
+        S3Key: AdventuresOfWilburUploadFunctionCode
+      Description: Upload the data to the database and S3
+      FunctionName: AdventuresOfWilburUploadFunction
+      Handler: AdventuresOfWilburUplaodFunction::AdventuresOfWilburUploadFunction.Function::FunctionHandlerAsync
+      Role: !GetAtt AdventuresOfWilburFunctionRole.Arn
+      Runtime: dotnetcore3.1
+      Timeout: 60
 
   AdventuresOfWilburApiPermissions:
     Type: AWS::Lambda::Permission
     Properties:
       Action: 'lambda:InvokeFunction'
       FunctionName: AdventuresOfWilburRandomImageFunction
+      Principal: 'apigateway.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
+
+  AdventuresOfWilburApiUploadPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: AdventuresOfWilburUploadFunction
       Principal: 'apigateway.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
@@ -76,6 +82,13 @@ Resources:
       PathPart: 'lambda'
       RestApiId: !Ref AdventuresOfWilburRestApi
 
+  AdventuresOfWilburUploadResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt AdventuresOfWilburRestApi.RootResourceId
+      PathPart: 'upload'
+      RestApiId: !Ref AdventuresOfWilburRestApi
+
   AdventuresOfWilburApiGatewayMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -90,6 +103,22 @@ Resources:
         Type: AWS_PROXY
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburRandomImageFunction.Arn}/invocations'
       ResourceId: !Ref AdventuresOfWilburResource
+      RestApiId: !Ref AdventuresOfWilburRestApi
+
+  AdventuresOfWilburApuGatewayUploadMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt AdventuresOfWilburApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburUploadFunction.Arn}/invocations'
+      ResourceId: !Ref AdventuresOfWilburUploadResource
       RestApiId: !Ref AdventuresOfWilburRestApi
 
   AdventuresOfWilburApiGatewayModel:
@@ -134,7 +163,9 @@ Resources:
             Statement:
               - Effect: 'Allow'
                 Action: 'lambda:*'
-                Resource: !GetAtt AdventuresOfWilburRandomImageFunction.Arn
+                Resource: 
+                  - !GetAtt AdventuresOfWilburRandomImageFunction.Arn
+                  - !GetAtt AdventuresOfWilburUploadFunction.Arn
 
 
   AdventuresOfWilburImageTable:
