@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.APIGatewayEvents;
+using Newtonsoft.Json;
 
 namespace AdventuresOfWilbur
 {
@@ -69,31 +70,26 @@ namespace AdventuresOfWilbur
                         Body = ""
                     };
 
-                var imageKey = response.Item["ImageKey"].S;
+                var imageName = response.Item["ImageKey"].S;
                 var imageTitle = response.Item["Title"].S;
                 var imageDescription = response.Item["Description"].S;
                 var imageFriends = response.Item["Friends"].SS;
 
-                Console.WriteLine(imageKey);
+                Console.WriteLine(imageName);
                 Console.WriteLine(imageTitle);
                 Console.WriteLine(imageDescription);
                 Console.WriteLine(imageFriends);
                 
-                var imageName = "";
-                if (storyItem == 1)
-                {
-                    imageName = "WP_20160601_20_39_24_Pro.jpg";
-                }
-                else
-                {
-                    imageName = "WP_20160601_20_38_09_Pro.jpg";
-                }
+                var imageUrl = $"{BucketBaseUrl}/{imageName}";
+                
+                var imageData = new ImageData(imageUrl, imageTitle, imageDescription, imageFriends);
+                var serializedImageData = JsonConvert.SerializeObject(imageData);
                 
                 return new APIGatewayProxyResponse
                 {
                     StatusCode = 200,
                     Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
-                    Body = $"{BucketBaseUrl}/{imageName}"
+                    Body = serializedImageData
                 };
             }
             catch(KeyNotFoundException)
