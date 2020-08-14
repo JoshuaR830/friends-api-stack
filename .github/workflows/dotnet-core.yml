@@ -37,9 +37,3 @@ jobs:
         dotnet tool install -g Amazon.Lambda.Tools
         dotnet lambda deploy-function --function-name AdventuresOfWilburRandomImageFunction
       working-directory: ./AdventuresOfWilbur/src/AdventuresOfWilbur
-    - name: Update stack
-      uses: aws-actions/aws-cloudformation-github-deploy@v1
-      with:
-        name: adventures-of-wilbur
-        template: template.yaml
-        no-fail-on-empty-changeset: 1
