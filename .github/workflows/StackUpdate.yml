@@ -33,8 +33,6 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-2
-    - name: setupdirectory
-      working-directory: ./AdventuresOfWilburUploadFunction/src/AdventuresOfWilburUploadFunction
     - name: Update stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
