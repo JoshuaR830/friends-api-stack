@@ -25,7 +25,17 @@ namespace AdventuresOfWilbur
             {
                 var somethingElse = int.Parse(input.QueryStringParameters["storyItemNumber"]);
                 Console.WriteLine(somethingElse);
-                var imageName = "WP_20160601_20_39_24_Pro.jpg";
+
+                var imageName = "";
+                if (somethingElse == 1)
+                {
+                    imageName = "WP_20160601_20_39_24_Pro.jpg";
+                }
+                else
+                {
+                    imageName = "WP_20160601_20_38_09_Pro.jpg";
+                }
+                
                 return new APIGatewayProxyResponse
                 {
                     StatusCode = 200,
