@@ -1,5 +1,28 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
+
+  ApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !GetAtt ApiGatewayLoggingRole.Arn
+
+  ApiGatewayLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+      
+
   AdventuresOfWilburRandomImageFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -8,12 +31,10 @@ Resources:
         S3Key: AdventuresOfWilburRandomImageFunctionCode
       Description: Get a random image of Wilbur
       FunctionName: AdventuresOfWilburRandomImageFunction
-      Handler: AdventuresOfWilbur::AdventuresOfWilbur.Function:FunctionHandlerAsync
-      Role:
-        Fn::GetAtt:
-          - AdventuresOfWilburFunctionRole
-          - Arn
+      Handler: AdventuresOfWilbur::AdventuresOfWilbur.Function::FunctionHandlerAsync
+      Role: !GetAtt AdventuresOfWilburFunctionRole.Arn
       Runtime: dotnetcore3.1
+      Timeout: 60
 
   # AdventuresOfWilburRandomImageFunction:
   #   Type: AWS::Serverless::Function
@@ -38,37 +59,83 @@ Resources:
       Principal: 'apigateway.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
-  AdventuresOfWilburResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId: !GetAtt
-        - AdventuresOfWilburRestApi
-        - RootResourceId
-      PathPart: '{proxy+}'
-      RestApiId: !Ref AdventuresOfWilburRestApi
-
-  AdventuresOfWilburResourceANY:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      AuthorizationType: NONE
-      HttpMethod: ANY
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub >-
-          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburRandomImageFunction.Arn}/invocations
-      RestApiId: !Ref AdventuresOfWilburRestApi
-      ResourceId: !Ref AdventuresOfWilburResource
-
-
   AdventuresOfWilburRestApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      BinaryMediaTypes:
-        - "image/png"
-        - "image/jpg"
+      ApiKeySourceType: HEADER
       Description: "An API for getting images from S3 with a lambda"
       Name: AdventuresOfWilburRestApi
+      EndpointConfiguration:
+        Types:
+          - EDGE
+          
+  AdventuresOfWilburResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt AdventuresOfWilburRestApi.RootResourceId
+      PathPart: 'lambda'
+      RestApiId: !Ref AdventuresOfWilburRestApi
+
+  AdventuresOfWilburApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt AdventuresOfWilburApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburRandomImageFunction.Arn}/invocations'
+      ResourceId: !Ref AdventuresOfWilburResource
+      RestApiId: !Ref AdventuresOfWilburRestApi
+
+  AdventuresOfWilburApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref AdventuresOfWilburRestApi
+      Schema: {}
+
+  AdventuresOfWilburApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref AdventuresOfWilburApiGatewayDeployment
+      RestApiId: !Ref AdventuresOfWilburRestApi
+      StageName: 'v0'
+
+  AdventuresOfWilburApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: AdventuresOfWilburApiGatewayMethod
+    Properties:
+      Description: Adventures of Wilbur API deployment
+      RestApiId: !Ref AdventuresOfWilburRestApi
+
+
+  AdventuresOfWilburApiGatewayIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyName: LambdaAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: 'lambda:*'
+                Resource: !GetAtt AdventuresOfWilburRandomImageFunction.Arn
+
 
   AdventuresOfWilburImageTable:
     Type: AWS::DynamoDB::Table
