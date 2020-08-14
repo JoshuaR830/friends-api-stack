@@ -1,7 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Lambda.APIGatewayEvents;
+using Amazon.Lambda.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 using Amazon.Lambda.Core;
 
@@ -12,16 +14,25 @@ namespace AdventuresOfWilburUploadFunction
 {
     public class Function
     {
-        
-        /// <summary>
-        /// A simple function that takes a string and does a ToUpper
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public string FunctionHandlerAsync(string input, ILambdaContext context)
+        private ServiceCollection _serviceCollection;
+
+        public Function()
         {
-            return input?.ToUpper();
+            ConfigureServices();
+        }
+        
+        private void ConfigureServices()
+        {
+            _serviceCollection = new ServiceCollection();
+            _serviceCollection.AddDefaultAWSOptions(new AWSOptions());
+            _serviceCollection.AddAWSService<IAmazonDynamoDB>();
+            _serviceCollection.AddTransient<Handler>();
+        }
+
+        public async Task<APIGatewayProxyResponse> FunctionHandlerAsync(APIGatewayProxyRequest input, ILambdaContext context)
+        {
+            using (ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider())
+                return await serviceProvider.GetService<Handler>().Handle(input);
         }
     }
 }
