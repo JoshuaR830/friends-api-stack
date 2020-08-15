@@ -25,8 +25,10 @@ namespace AdventuresOfWilburUploadFunction
         {
             Console.WriteLine(input.Body);
             var body = JsonConvert.DeserializeObject<ImageData>(input.Body);
-            var bytes = body.Image;
+            var bytes = Convert.FromBase64String(body.Image);
             var fileName = body.FileName;
+
+            Console.WriteLine(bytes);
             
             Image newImage;
 
