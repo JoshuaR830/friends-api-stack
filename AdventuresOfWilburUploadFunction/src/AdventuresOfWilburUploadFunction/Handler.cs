@@ -6,6 +6,8 @@ using AdventuresOfWilbur;
 using Amazon.Lambda.APIGatewayEvents;
 using Newtonsoft.Json;
 using System.Drawing;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -14,11 +16,13 @@ namespace AdventuresOfWilburUploadFunction
 {
     public class Handler
     {
-        IAmazonS3 _amazonS3;
+        private readonly IAmazonS3 _amazonS3;
+        private readonly IAmazonDynamoDB _dynamoDb;
         
-        public Handler(IAmazonS3 amazonS3)
+        public Handler(IAmazonS3 amazonS3, IAmazonDynamoDB dynamoDb)
         {
             _amazonS3 = amazonS3;
+            _dynamoDb = dynamoDb;
         }
 
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
@@ -27,6 +31,8 @@ namespace AdventuresOfWilburUploadFunction
             var body = JsonConvert.DeserializeObject<ImageData>(input.Body);
             var bytes = Convert.FromBase64String(body.Image);
             var fileName = body.FileName;
+
+            
 
             Console.WriteLine(bytes);
             
@@ -52,6 +58,21 @@ namespace AdventuresOfWilburUploadFunction
             const string bucketName = "adventures-of-wilbur-images";
 
             await fileTransferUtility.UploadAsync(new MemoryStream(bytes, 0, bytes.Length), bucketName, fileName);
+            
+            var putItemRequest = new PutItemRequest
+            {
+                TableName = "AdventuresOfWilburImageTable",
+                Item = new Dictionary<string, AttributeValue>
+                {
+                    {"ImageId", new AttributeValue {N = body.SequenceNumber.ToString()}},
+                    {"Description", new AttributeValue {S = body.Description}},
+                    {"Friends", new AttributeValue {SS = body.Friends }},
+                    {"ImageKey", new AttributeValue {S = body.FileName}},
+                    {"Title", new AttributeValue {S = body.Title}}
+                }
+            };
+
+            await _dynamoDb.PutItemAsync(putItemRequest);
             
             return new APIGatewayProxyResponse
             {
