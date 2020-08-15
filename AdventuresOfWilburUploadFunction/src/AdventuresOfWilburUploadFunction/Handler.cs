@@ -23,7 +23,7 @@ namespace AdventuresOfWilburUploadFunction
 
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
-
+            Console.WriteLine(input.Body);
             var body = JsonConvert.DeserializeObject<ImageData>(input.Body);
             var bytes = body.Image;
             var fileName = body.FileName;
