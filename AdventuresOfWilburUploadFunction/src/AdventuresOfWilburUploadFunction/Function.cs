@@ -6,6 +6,7 @@ using Amazon.Lambda.Core;
 using Microsoft.Extensions.DependencyInjection;
 
 using Amazon.Lambda.Core;
+using Amazon.S3;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -26,6 +27,7 @@ namespace AdventuresOfWilburUploadFunction
             _serviceCollection = new ServiceCollection();
             _serviceCollection.AddDefaultAWSOptions(new AWSOptions());
             _serviceCollection.AddAWSService<IAmazonDynamoDB>();
+            _serviceCollection.AddAWSService<IAmazonS3>();
             _serviceCollection.AddTransient<Handler>();
         }
 
