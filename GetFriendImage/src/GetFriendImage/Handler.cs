@@ -32,11 +32,6 @@ namespace GetFriendImage
                 var scanRequest = new ScanRequest
                 {
                     TableName = "FriendImageTable",
-                    // ExclusiveStartKey = new Dictionary<string, AttributeValue>
-                    // {
-                    //     {"ImageId", new AttributeValue{ S = Guid.NewGuid().ToString() }}
-                    // },
-                    // Limit = 1,
                     ProjectionExpression = "#imageUrl",
                     ExpressionAttributeNames = new Dictionary<string, string>
                     {
@@ -47,10 +42,10 @@ namespace GetFriendImage
                 var items = new List<Dictionary<string, AttributeValue>>();
 
                 var response = await _dynamoDb.ScanAsync(scanRequest);
+
+                items.AddRange(response.Items);
                 
-                Console.WriteLine(response.LastEvaluatedKey);
-                
-                while (response.LastEvaluatedKey != null)
+                while (response.LastEvaluatedKey.Values.Count != 0)
                 {
                     scanRequest = new ScanRequest
                     {
@@ -86,7 +81,7 @@ namespace GetFriendImage
 
                 Console.WriteLine($"Index: {index}");
                 
-                var imageName = response.Items[index]["ImageUrl"].S;
+                var imageName = items[index]["ImageUrl"].S;
 
                 Console.WriteLine(imageName);
 
