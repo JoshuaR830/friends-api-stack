@@ -29,9 +29,7 @@ namespace GetFriendImageUploadFunction
             var body = JsonConvert.DeserializeObject<ImageData>(input.Body);
             var bytes = Convert.FromBase64String(body.Image);
             var fileName = body.FileName;
-
             
-
             Console.WriteLine(bytes);
             
             Image newImage;
@@ -53,8 +51,8 @@ namespace GetFriendImageUploadFunction
             
             var fileTransferUtility = new TransferUtility(_amazonS3);
 
-            const string bucketName = "generic-images";
-
+            const string bucketName = "generic-images/jordan/2948bd67-99fa-4fb5-9500-8c4f21d41b2e/7a35d82f-7662-42d5-a235-dfe34acd8109/images";
+            
             await fileTransferUtility.UploadAsync(new MemoryStream(bytes, 0, bytes.Length), bucketName, fileName);
             
             var putItemRequest = new PutItemRequest
@@ -62,11 +60,9 @@ namespace GetFriendImageUploadFunction
                 TableName = "FriendImageTable",
                 Item = new Dictionary<string, AttributeValue>
                 {
-                    {"ImageId", new AttributeValue {N = body.SequenceNumber.ToString()}},
-                    {"Description", new AttributeValue {S = body.Description}},
-                    {"Friends", new AttributeValue {SS = body.Friends }},
-                    {"ImageKey", new AttributeValue {S = body.FileName}},
-                    {"Title", new AttributeValue {S = body.Title}}
+                    {"ImageId", new AttributeValue {S = Guid.NewGuid().ToString()}},
+                    {"Name", new AttributeValue {S = body.Friends[0] }},
+                    {"ImageUrl", new AttributeValue {S = body.FileName}},
                 }
             };
 
