@@ -6,13 +6,13 @@ using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Newtonsoft.Json;
 
-namespace AdventuresOfWilbur
+namespace GetFriendImage
 {
     public class Handler
     {
         private readonly IAmazonDynamoDB _dynamoDb;
         
-        private const string BucketBaseUrl = "https://adventures-of-wilbur-images.s3.eu-west-2.amazonaws.com";
+        private const string BucketBaseUrl = "https://generic-images.s3.eu-west-2.amazonaws.com";
 
         public Handler(IAmazonDynamoDB dynamoDb)
         {
@@ -36,7 +36,7 @@ namespace AdventuresOfWilbur
                 
                 var tableDescription = new DescribeTableRequest
                 {
-                    TableName = "AdventuresOfWilburImageTable"
+                    TableName = "FriendImageTable"
                 };
 
                 
@@ -63,7 +63,7 @@ namespace AdventuresOfWilbur
                 
                 var getRequest = new GetItemRequest
                 {
-                    TableName = "AdventuresOfWilburImageTable",
+                    TableName = "FriendImageTable",
                     Key = new Dictionary<string, AttributeValue>
                     {
                         {"ImageId", new AttributeValue{ N = imageId.ToString() }}

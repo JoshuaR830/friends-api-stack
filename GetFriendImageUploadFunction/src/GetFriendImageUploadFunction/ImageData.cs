@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace AdventuresOfWilbur
+namespace GetFriendImageUploadFunction
 {
     public class ImageData
     {

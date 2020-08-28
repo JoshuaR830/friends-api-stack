@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using AdventuresOfWilbur;
 using Amazon.Lambda.APIGatewayEvents;
 using Newtonsoft.Json;
 using System.Drawing;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 
-namespace AdventuresOfWilburUploadFunction
+namespace GetFriendImageUploadFunction
 {
     public class Handler
     {
@@ -55,13 +53,13 @@ namespace AdventuresOfWilburUploadFunction
             
             var fileTransferUtility = new TransferUtility(_amazonS3);
 
-            const string bucketName = "adventures-of-wilbur-images";
+            const string bucketName = "generic-images";
 
             await fileTransferUtility.UploadAsync(new MemoryStream(bytes, 0, bytes.Length), bucketName, fileName);
             
             var putItemRequest = new PutItemRequest
             {
-                TableName = "AdventuresOfWilburImageTable",
+                TableName = "FriendImageTable",
                 Item = new Dictionary<string, AttributeValue>
                 {
                     {"ImageId", new AttributeValue {N = body.SequenceNumber.ToString()}},

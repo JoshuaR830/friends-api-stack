@@ -23,73 +23,73 @@ Resources:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
       
 
-  AdventuresOfWilburRandomImageFunction:
+  GetFriendImageFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: adventures-of-wilbur-functions
-        S3Key: AdventuresOfWilburRandomImageFunctionCode
-      Description: Get a random image of Wilbur
-      FunctionName: AdventuresOfWilburRandomImageFunction
-      Handler: AdventuresOfWilbur::AdventuresOfWilbur.Function::FunctionHandlerAsync
-      Role: !GetAtt AdventuresOfWilburFunctionRole.Arn
+        S3Bucket: get-friend-image-functions
+        S3Key: GetFriendImageFunctionCode
+      Description: Get a random image of Jordan
+      FunctionName: GetFriendImageFunction
+      Handler: GetFriendImage::GetFriendImage.Function::FunctionHandlerAsync
+      Role: !GetAtt GetFriendImageFunctionRole.Arn
       Runtime: dotnetcore3.1
       Timeout: 60
 
-  AdventuresOfWilburUploadFunction:
+  GetFriendImageUploadFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: adventures-of-wilbur-functions
-        S3Key: AdventuresOfWilburUploadFunctionCode
+        S3Bucket: get-friend-image-functions
+        S3Key: GetFriendImageUploadFunctionCode
       Description: Upload the data to the database and S3
-      FunctionName: AdventuresOfWilburUploadFunction
-      Handler: AdventuresOfWilburUplaodFunction::AdventuresOfWilburUploadFunction.Function::FunctionHandlerAsync
-      Role: !GetAtt AdventuresOfWilburFunctionRole.Arn
+      FunctionName: GetFriendImageUploadFunction
+      Handler: GetFriendImageUplaodFunction::GetFriendImageUploadFunction.Function::FunctionHandlerAsync
+      Role: !GetAtt GetFriendImageFunctionRole.Arn
       Runtime: dotnetcore3.1
       Timeout: 60
 
-  AdventuresOfWilburApiPermissions:
+  GetFriendImageApiPermissions:
     Type: AWS::Lambda::Permission
     Properties:
       Action: 'lambda:InvokeFunction'
-      FunctionName: AdventuresOfWilburRandomImageFunction
+      FunctionName: GetFriendImageFunction
       Principal: 'apigateway.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
-  AdventuresOfWilburApiUploadPermissions:
+  GetFriendImageApiUploadPermissions:
     Type: AWS::Lambda::Permission
     Properties:
       Action: 'lambda:InvokeFunction'
-      FunctionName: AdventuresOfWilburUploadFunction
+      FunctionName: GetFriendImageUploadFunction
       Principal: 'apigateway.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
-  AdventuresOfWilburRestApi:
+  GetFriendImageRestApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
       ApiKeySourceType: HEADER
       Description: "An API for getting images from S3 with a lambda"
-      Name: AdventuresOfWilburRestApi
+      Name: GetFriendImageRestApi
       EndpointConfiguration:
         Types:
           - EDGE
           
-  AdventuresOfWilburResource:
+  GetFriendImageResource:
     Type: AWS::ApiGateway::Resource
     Properties:
-      ParentId: !GetAtt AdventuresOfWilburRestApi.RootResourceId
+      ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
       PathPart: 'lambda'
-      RestApiId: !Ref AdventuresOfWilburRestApi
+      RestApiId: !Ref GetFriendImageRestApi
 
-  AdventuresOfWilburUploadResource:
+  GetFriendImageUploadResource:
     Type: AWS::ApiGateway::Resource
     Properties:
-      ParentId: !GetAtt AdventuresOfWilburRestApi.RootResourceId
+      ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
       PathPart: 'upload'
-      RestApiId: !Ref AdventuresOfWilburRestApi
+      RestApiId: !Ref GetFriendImageRestApi
 
-  AdventuresOfWilburApiGatewayMethod:
+  GetFriendImageApiGatewayMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       ApiKeyRequired: false
@@ -97,15 +97,15 @@ Resources:
       HttpMethod: GET
       Integration:
         ConnectionType: INTERNET
-        Credentials: !GetAtt AdventuresOfWilburApiGatewayIamRole.Arn
+        Credentials: !GetAtt GetFriendImageApiGatewayIamRole.Arn
         IntegrationHttpMethod: POST
         PassthroughBehavior: WHEN_NO_MATCH
         Type: AWS_PROXY
-        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburRandomImageFunction.Arn}/invocations'
-      ResourceId: !Ref AdventuresOfWilburResource
-      RestApiId: !Ref AdventuresOfWilburRestApi
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetFriendImageFunction.Arn}/invocations'
+      ResourceId: !Ref GetFriendImageResource
+      RestApiId: !Ref GetFriendImageRestApi
 
-  AdventuresOfWilburApuGatewayUploadMethod:
+  GetFriendImageApuGatewayUploadMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       ApiKeyRequired: false
@@ -113,37 +113,36 @@ Resources:
       HttpMethod: POST
       Integration:
         ConnectionType: INTERNET
-        Credentials: !GetAtt AdventuresOfWilburApiGatewayIamRole.Arn
+        Credentials: !GetAtt GetFriendImageApiGatewayIamRole.Arn
         IntegrationHttpMethod: POST
         PassthroughBehavior: WHEN_NO_MATCH
         Type: AWS_PROXY
-        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AdventuresOfWilburUploadFunction.Arn}/invocations'
-      ResourceId: !Ref AdventuresOfWilburUploadResource
-      RestApiId: !Ref AdventuresOfWilburRestApi
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetFriendImageUploadFunction.Arn}/invocations'
+      ResourceId: !Ref GetFriendImageUploadResource
+      RestApiId: !Ref GetFriendImageRestApi
 
-  AdventuresOfWilburApiGatewayModel:
+  GetFriendImageApiGatewayModel:
     Type: AWS::ApiGateway::Model
     Properties:
       ContentType: 'application/json'
-      RestApiId: !Ref AdventuresOfWilburRestApi
+      RestApiId: !Ref GetFriendImageRestApi
       Schema: {}
 
-  AdventuresOfWilburApiGatewayStage:
+  GetFriendImageApiGatewayStage:
     Type: AWS::ApiGateway::Stage
     Properties:
-      DeploymentId: !Ref AdventuresOfWilburApiGatewayDeployment
-      RestApiId: !Ref AdventuresOfWilburRestApi
+      DeploymentId: !Ref GetFriendImageApiGatewayDeployment
+      RestApiId: !Ref GetFriendImageRestApi
       StageName: 'v0'
 
-  AdventuresOfWilburApiGatewayDeployment:
+  GetFriendImageApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
-    DependsOn: AdventuresOfWilburApiGatewayMethod
+    DependsOn: GetFriendImageApiGatewayMethod
     Properties:
-      Description: Adventures of Wilbur API deployment
-      RestApiId: !Ref AdventuresOfWilburRestApi
+      Description: Random friend image API deployment
+      RestApiId: !Ref GetFriendImageRestApi
 
-
-  AdventuresOfWilburApiGatewayIamRole:
+  GetFriendImageApiGatewayIamRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -164,11 +163,10 @@ Resources:
               - Effect: 'Allow'
                 Action: 'lambda:*'
                 Resource: 
-                  - !GetAtt AdventuresOfWilburRandomImageFunction.Arn
-                  - !GetAtt AdventuresOfWilburUploadFunction.Arn
+                  - !GetAtt GetFriendImageFunction.Arn
+                  - !GetAtt GetFriendImageUploadFunction.Arn
 
-
-  AdventuresOfWilburImageTable:
+  FriendImageTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -183,30 +181,9 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
-      TableName: "AdventuresOfWilburImageTable"
+      TableName: "FriendImageTable"
 
-  AdventuresOfWilburImagesBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      AccessControl: PublicRead
-      BucketName: adventures-of-wilbur-images
-    DeletionPolicy: Retain
-
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: adventures-of-wilbur-images
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          -
-            Action:
-              - "s3:GetObject"
-            Effect: "Allow"
-            Principal: "*"
-            Resource: "arn:aws:s3:::adventures-of-wilbur-images/*"
-
-  AdventuresOfWilburFunctionRole:
+  GetFriendImageFunctionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -218,7 +195,7 @@ Resources:
               - lambda.amazonaws.com
             Action:
               - 'sts:AssumeRole'
-      Description: IAM role for the adventures of Wilbur image functions
+      Description: IAM role for the friends image functions
       Path: /
       Policies:
         - PolicyName: AWSLambdaBasicExecutionRole
@@ -246,7 +223,7 @@ Resources:
                   - 'dynamodb:PutItem'
                   - 'dynamodb:UpdateItem'
                 Resource: 
-                  - 'arn:aws:dynamodb:*:*:table/AdventuresOfWilburImageTable'
+                  - 'arn:aws:dynamodb:*:*:table/FriendImageTable'
         - PolicyName: AmazonS3FullAccess
           PolicyDocument:
             Version: 2012-10-17
@@ -256,7 +233,7 @@ Resources:
                 Resource:
                   - 'arn:aws:s3:::exchange-data-raw'
                   - 'arn:aws:s3:::Exchange-data-raw/*'
-                  - 'arn:aws:s3:::adventures-of-wilbur-images/*'
+                  - 'arn:aws:s3:::generic-images/*'
         - PolicyName: ApiGatewayPermissions
           PolicyDocument:
             Version: 2012-10-17

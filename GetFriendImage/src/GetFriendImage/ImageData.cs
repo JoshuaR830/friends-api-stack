@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AdventuresOfWilbur
+namespace GetFriendImage
 {
     public class ImageData
     {
