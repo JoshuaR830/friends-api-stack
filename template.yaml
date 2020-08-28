@@ -172,7 +172,7 @@ Resources:
       AttributeDefinitions:
         -
           AttributeName: "ImageId"
-          AttributeType: "N"
+          AttributeType: "S"
       BillingMode: PROVISIONED
       KeySchema:
         -

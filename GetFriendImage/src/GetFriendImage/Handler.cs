@@ -12,7 +12,7 @@ namespace GetFriendImage
     {
         private readonly IAmazonDynamoDB _dynamoDb;
         
-        private const string BucketBaseUrl = "https://generic-images.s3.eu-west-2.amazonaws.com";
+        private const string BucketBaseUrl = "https://generic-images.s3.eu-west-2.amazonaws.com/jordan/2948bd67-99fa-4fb5-9500-8c4f21d41b2e/7a35d82f-7662-42d5-a235-dfe34acd8109/images";
 
         public Handler(IAmazonDynamoDB dynamoDb)
         {
@@ -29,52 +29,17 @@ namespace GetFriendImage
         {
             try
             {
-                var storyItem = int.Parse(input.QueryStringParameters["storyItemNumber"]);
-                var imageTime = input.QueryStringParameters["imageTime"];
-
-                Console.WriteLine(storyItem);
-                
-                var tableDescription = new DescribeTableRequest
-                {
-                    TableName = "FriendImageTable"
-                };
-
-                
-                Console.WriteLine("Describing");
-                var description = await _dynamoDb.DescribeTableAsync(tableDescription);
-                Console.WriteLine("Yay");
-                int numberOfItems = int.Parse(description.Table.ItemCount.ToString());
-                Console.WriteLine($"Item count: {numberOfItems}");
-
-                int imageId = 1;
-                switch (imageTime)
-                {
-                    case "latest":
-                        imageId = numberOfItems;
-                        break;
-                    case "random":
-                        var rand = new Random();
-                        imageId = rand.Next(1, (numberOfItems + 1));
-                        break;
-                    default:
-                        imageId = storyItem;
-                        break;
-                }
-                
                 var getRequest = new GetItemRequest
                 {
                     TableName = "FriendImageTable",
                     Key = new Dictionary<string, AttributeValue>
                     {
-                        {"ImageId", new AttributeValue{ N = imageId.ToString() }}
+                        {"ImageId", new AttributeValue{ S = "D670DC5A-9694-431D-92E5-74B937BEE043" }}
                     },
-                    ProjectionExpression = "#title, #description, #imageKey, #friends",
+                    ProjectionExpression = "#imageUrl",
                     ExpressionAttributeNames = new Dictionary<string, string>
                     {
-                        {"#imageKey", "ImageKey"},
-                        {"#title", "Title"},
-                        {"#description", "Description"},
-                        {"#friends", "Friends"}
+                        {"#imageUrl", "ImageUrl"},
                     },
                 };
 
@@ -88,19 +53,13 @@ namespace GetFriendImage
                         Body = ""
                     };
 
-                var imageName = response.Item["ImageKey"].S;
-                var imageTitle = response.Item["Title"].S;
-                var imageDescription = response.Item["Description"].S;
-                var imageFriends = response.Item["Friends"].SS;
+                var imageName = response.Item["ImageUrl"].S;
 
                 Console.WriteLine(imageName);
-                Console.WriteLine(imageTitle);
-                Console.WriteLine(imageDescription);
-                Console.WriteLine(imageFriends);
-                
+
                 var imageUrl = $"{BucketBaseUrl}/{imageName}";
                 
-                var imageData = new ImageData(imageUrl, imageTitle, imageDescription, imageFriends, numberOfItems);
+                var imageData = new ImageData(imageUrl);
                 var serializedImageData = JsonConvert.SerializeObject(imageData);
                 
                 return new APIGatewayProxyResponse
