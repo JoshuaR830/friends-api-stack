@@ -32,11 +32,11 @@ namespace GetFriendImage
                 var scanRequest = new ScanRequest
                 {
                     TableName = "FriendImageTable",
-                    ExclusiveStartKey = new Dictionary<string, AttributeValue>
-                    {
-                        {"ImageId", new AttributeValue{ S = Guid.NewGuid().ToString() }}
-                    },
-                    Limit = 1,
+                    // ExclusiveStartKey = new Dictionary<string, AttributeValue>
+                    // {
+                    //     {"ImageId", new AttributeValue{ S = Guid.NewGuid().ToString() }}
+                    // },
+                    // Limit = 1,
                     ProjectionExpression = "#imageUrl",
                     ExpressionAttributeNames = new Dictionary<string, string>
                     {
@@ -44,9 +44,34 @@ namespace GetFriendImage
                     },
                 };
 
+                var items = new List<Dictionary<string, AttributeValue>>();
+
                 var response = await _dynamoDb.ScanAsync(scanRequest);
                 
-                if(response.Count == 0)
+                Console.WriteLine(response.LastEvaluatedKey);
+                
+                while (response.LastEvaluatedKey != null)
+                {
+                    scanRequest = new ScanRequest
+                    {
+                        TableName = "FriendImageTable",
+                        ExclusiveStartKey = new Dictionary<string, AttributeValue>
+                        {
+                            {"ImageId", new AttributeValue{ S = response.LastEvaluatedKey.ToString() }}
+                        },
+                        ProjectionExpression = "#imageUrl",
+                        ExpressionAttributeNames = new Dictionary<string, string>
+                        {
+                            {"#imageUrl", "ImageUrl"},
+                        },
+                    };
+                    
+                    response = await _dynamoDb.ScanAsync(scanRequest);
+
+                    items.AddRange(response.Items);
+                }
+
+                if(items.Count == 0)
                     return new APIGatewayProxyResponse
                     {
                         StatusCode = 403,
@@ -54,7 +79,14 @@ namespace GetFriendImage
                         Body = ""
                     };
 
-                var imageName = response.Items[0]["ImageUrl"].S;
+                Console.WriteLine($"Number of items: {items.Count}");
+
+                var random = new Random();
+                var index = random.Next(0, items.Count);
+
+                Console.WriteLine($"Index: {index}");
+                
+                var imageName = response.Items[index]["ImageUrl"].S;
 
                 Console.WriteLine(imageName);
 
