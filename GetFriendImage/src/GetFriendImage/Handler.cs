@@ -29,13 +29,14 @@ namespace GetFriendImage
         {
             try
             {
-                var getRequest = new GetItemRequest
+                var scanRequest = new ScanRequest
                 {
                     TableName = "FriendImageTable",
-                    Key = new Dictionary<string, AttributeValue>
+                    ExclusiveStartKey = new Dictionary<string, AttributeValue>
                     {
-                        {"ImageId", new AttributeValue{ S = "D670DC5A-9694-431D-92E5-74B937BEE043" }}
+                        {"ImageId", new AttributeValue{ S = Guid.NewGuid().ToString() }}
                     },
+                    Limit = 1,
                     ProjectionExpression = "#imageUrl",
                     ExpressionAttributeNames = new Dictionary<string, string>
                     {
@@ -43,9 +44,9 @@ namespace GetFriendImage
                     },
                 };
 
-                var response = await _dynamoDb.GetItemAsync(getRequest);
+                var response = await _dynamoDb.ScanAsync(scanRequest);
                 
-                if(!response.IsItemSet)
+                if(response.Count == 0)
                     return new APIGatewayProxyResponse
                     {
                         StatusCode = 403,
@@ -53,7 +54,7 @@ namespace GetFriendImage
                         Body = ""
                     };
 
-                var imageName = response.Item["ImageUrl"].S;
+                var imageName = response.Items[0]["ImageUrl"].S;
 
                 Console.WriteLine(imageName);
 
