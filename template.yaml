@@ -78,13 +78,13 @@ Resources:
       Principal: 'apigateway.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
-  # BotuaFriendTimeApiPermissions:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     Action: 'lambda:InvokeFunction'
-  #     FunctionName: BotuaFriendTimeFunction
-  #     Principal: 'apigateway.amazonaws.com'
-  #     SourceAccount: !Ref 'AWS::AccountId'
+  BotuaFriendTimeApiPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: BotuaFriendTimeFunction
+      Principal: 'apigateway.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
 
   GetFriendImageRestApi:
     Type: AWS::ApiGateway::RestApi
@@ -110,12 +110,12 @@ Resources:
       PathPart: 'upload'
       RestApiId: !Ref GetFriendImageRestApi
 
-  # BotuaFriendTimeResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
-  #     PathPart: 'time'
-  #     RestApiId: !Ref GetFriendImageRestApi
+  BotuaFriendTimeResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
+      PathPart: 'time'
+      RestApiId: !Ref GetFriendImageRestApi
 
   GetFriendImageApiGatewayMethod:
     Type: AWS::ApiGateway::Method
@@ -149,21 +149,21 @@ Resources:
       ResourceId: !Ref GetFriendImageUploadResource
       RestApiId: !Ref GetFriendImageRestApi
 
-  # BotuaFriendTimeApiGatewayUploadMethod:
-  #   Type: AWS::ApiGateway::Method
-  #   Properties:
-  #     ApiKeyRequired: false
-  #     AuthorizationType: NONE
-  #     HttpMethod: GET
-  #     Integration:
-  #       ConnectionType: INTERNET
-  #       Credentials: !GetAtt GetFriendImageApiGatewayIamRole.Arn
-  #       IntegrationHttpMethod: POST
-  #       PassthroughBehavior: WHEN_NO_MATCH
-  #       Type: AWS_PROXY
-  #       Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BotuaFriendTimeFunction.Arn}/invocations'
-  #     ResourceId: !Ref BotuaFriendTimeResource
-  #     RestApiId: !Ref GetFriendImageRestApi
+  BotuaFriendTimeApiGatewayUploadMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt GetFriendImageApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BotuaFriendTimeFunction.Arn}/invocations'
+      ResourceId: !Ref BotuaFriendTimeResource
+      RestApiId: !Ref GetFriendImageRestApi
 
   GetFriendImageApiGatewayModel:
     Type: AWS::ApiGateway::Model
