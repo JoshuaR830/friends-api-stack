@@ -25,10 +25,10 @@ namespace BotuaFriendTime
         public async Task<APIGatewayProxyResponse> Handle (APIGatewayProxyRequest input)
         {
             
-            var userId = int.Parse(input.QueryStringParameters["userId"]);
-            var timestamp = int.Parse(input.QueryStringParameters["timestamp"]);
-            var serverId = int.Parse(input.QueryStringParameters["serverId"]);
-            var channelId = int.Parse(input.QueryStringParameters["channelId"]);
+            var userId = long.Parse(input.QueryStringParameters["userId"]);
+            var timestamp = long.Parse(input.QueryStringParameters["timestamp"]);
+            var serverId = long.Parse(input.QueryStringParameters["serverId"]);
+            var channelId = long.Parse(input.QueryStringParameters["channelId"]);
             var connectionStatus = bool.Parse(input.QueryStringParameters["connectionStatus"]);
 
             Console.WriteLine(userId);
