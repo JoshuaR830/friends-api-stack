@@ -209,6 +209,7 @@ Resources:
                 Resource: 
                   - !GetAtt GetFriendImageFunction.Arn
                   - !GetAtt GetFriendImageUploadFunction.Arn
+                  - !GetAtt BotuaFriendTimeFunction.Arn
 
   FriendImageTable:
     Type: AWS::DynamoDB::Table
