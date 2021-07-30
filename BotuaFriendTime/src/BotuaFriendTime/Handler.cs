@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
@@ -23,6 +24,16 @@ namespace BotuaFriendTime
         /// <returns></returns>
         public async Task<APIGatewayProxyResponse> Handle (APIGatewayProxyRequest input)
         {
+            
+            var userId = int.Parse(input.QueryStringParameters["userId"]);
+            var timestamp = int.Parse(input.QueryStringParameters["timestamp"]);
+            var serverId = int.Parse(input.QueryStringParameters["serverId"]);
+            var channelId = int.Parse(input.QueryStringParameters["channelId"]);
+            var connectionStatus = int.Parse(input.QueryStringParameters["connectionStatus"]);
+
+            Console.WriteLine(userId);
+            Console.WriteLine(timestamp);
+            
             return new APIGatewayProxyResponse
             {
                 StatusCode = 200,
