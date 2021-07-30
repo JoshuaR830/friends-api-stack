@@ -29,7 +29,7 @@ namespace BotuaFriendTime
             var timestamp = int.Parse(input.QueryStringParameters["timestamp"]);
             var serverId = int.Parse(input.QueryStringParameters["serverId"]);
             var channelId = int.Parse(input.QueryStringParameters["channelId"]);
-            var connectionStatus = int.Parse(input.QueryStringParameters["connectionStatus"]);
+            var connectionStatus = bool.Parse(input.QueryStringParameters["connectionStatus"]);
 
             Console.WriteLine(userId);
             Console.WriteLine(timestamp);
