@@ -27,7 +27,7 @@ namespace BotuaFriendTime
             {
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
-                Body = input?.Body?.ToUpper()
+                Body = "Hello"
             };
         }
     }
