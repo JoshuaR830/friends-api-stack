@@ -1,0 +1,37 @@
+
+name: .NET Core
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Install dependencies
+      run: dotnet restore
+      working-directory: ./BotuaFriendTime/src/BotuaFriendTime
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ./BotuaFriendTime/src/BotuaFriendTime
+    - name: Configure credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-2
+    - name: Deploy lambda
+      run: |
+        dotnet tool install -g Amazon.Lambda.Tools
+        dotnet lambda deploy-function --function-name BotuaFriendTimeFunction
+      working-directory: ./BotuaFriendTime/src/BotuaFriendTime
