@@ -29,6 +29,7 @@ namespace BotuaGetFriendTimes
             _serviceCollection.AddDefaultAWSOptions(new AWSOptions());
             _serviceCollection.AddAWSService<IAmazonDynamoDB>();
             _serviceCollection.AddTransient<Handler>();
+            
         }
         
         /// <summary>
