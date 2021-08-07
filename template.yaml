@@ -62,6 +62,20 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 60
 
+
+  BotuaGetFriendTimesFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: get-friend-image-functions
+        S3Key: BotuaGetFriendTimesFunctionFunctionCode
+      Description: Get data from the time table
+      FunctionName: BotuaGetFriendTimesFunction
+      Handler: BotuaGetFriendTimes::BotuaGetFriendTimes.Function::FunctionHandlerAsync
+      Role: !GetAtt GetFriendImageFunctionRole.Arn
+      Runtime: dotnetcore3.1
+      Timeout: 60
+
   GetFriendImageApiPermissions:
     Type: AWS::Lambda::Permission
     Properties:
@@ -83,6 +97,14 @@ Resources:
     Properties:
       Action: 'lambda:InvokeFunction'
       FunctionName: BotuaFriendTimeFunction
+      Principal: 'apigateway.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
+
+  BotuaGetFriendTimesApiPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: BotuaGetFriendTimesFunction
       Principal: 'apigateway.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
@@ -115,6 +137,13 @@ Resources:
     Properties:
       ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
       PathPart: 'time'
+      RestApiId: !Ref GetFriendImageRestApi
+
+  BotuaGetFriendTimesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
+      PathPart: 'get-time'
       RestApiId: !Ref GetFriendImageRestApi
 
   GetFriendImageApiGatewayMethod:
@@ -164,6 +193,23 @@ Resources:
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BotuaFriendTimeFunction.Arn}/invocations'
       ResourceId: !Ref BotuaFriendTimeResource
       RestApiId: !Ref GetFriendImageRestApi
+  
+  
+  BotuaGetFriendTimesApiGatewayUploadMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt GetFriendImageApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BotuaGetFriendTimesFunction.Arn}/invocations'
+      ResourceId: !Ref BotuaGetFriendTimesResource
+      RestApiId: !Ref GetFriendImageRestApi
 
   GetFriendImageApiGatewayModel:
     Type: AWS::ApiGateway::Model
@@ -209,6 +255,7 @@ Resources:
                 Resource: 
                   - !GetAtt GetFriendImageFunction.Arn
                   - !GetAtt GetFriendImageUploadFunction.Arn
+                  - !GetAtt BotuaGetFriendTimesFunction.Arn
                   - !GetAtt BotuaFriendTimeFunction.Arn
 
   FriendImageTable:
