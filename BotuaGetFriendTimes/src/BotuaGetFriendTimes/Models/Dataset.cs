@@ -11,7 +11,7 @@ namespace BotuaGetFriendTimes.Models
         public Dataset(string label, List<double> data)
         {
             Label = label;
-            data = data;
+            Data = data;
         }
     }
 }
