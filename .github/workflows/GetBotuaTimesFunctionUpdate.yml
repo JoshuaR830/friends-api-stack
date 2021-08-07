@@ -19,10 +19,10 @@ jobs:
         dotnet-version: 3.1.301
     - name: Install dependencies
       run: dotnet restore
-      working-directory: ./GetBotuaFriendTimes/src/GetBotuaFriendTimes
+      working-directory: ./BotuaGetFriendTimes/src/BotuaGetFriendTimes
     - name: Build
       run: dotnet build --configuration Release --no-restore
-      working-directory: ./GetBotuaFriendTimes/src/GetBotuaFriendTimes
+      working-directory: ./BotuaGetFriendTimes/src/BotuaGetFriendTimes
     - name: Configure credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -32,5 +32,5 @@ jobs:
     - name: Deploy lambda
       run: |
         dotnet tool install -g Amazon.Lambda.Tools
-        dotnet lambda deploy-function --function-name GetBotuaFriendTimesFunction
-      working-directory: ./GetBotuaFriendTimes/src/GetBotuaFriendTimes
+        dotnet lambda deploy-function --function-name BotuaGetFriendTimesFunction
+      working-directory: ./BotuaGetFriendTimes/src/BotuaGetFriendTimes
