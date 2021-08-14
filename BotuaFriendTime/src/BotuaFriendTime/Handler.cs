@@ -27,7 +27,7 @@ namespace BotuaFriendTime
         public async Task<APIGatewayProxyResponse> Handle (APIGatewayProxyRequest input)
         {
             
-            var sessionId = input.QueryStringParameters["sessionId"];
+            var sessionGuid = input.QueryStringParameters["sessionGuid"];
             var userId = long.Parse(input.QueryStringParameters["userId"]);
             var timestamp = long.Parse(input.QueryStringParameters["timestamp"]);
             var serverId = long.Parse(input.QueryStringParameters["serverId"]);
@@ -39,11 +39,11 @@ namespace BotuaFriendTime
 
             if (connectionStatus)
             {
-                await _friendRepository.PutNewFriendTimeData(sessionId, userId, timestamp, serverId, channelId);
+                await _friendRepository.PutNewFriendTimeData(sessionGuid, userId, timestamp, serverId, channelId);
             }
             else
             {
-                await _friendRepository.AlterExistingFriendTimeData(sessionId, userId, timestamp, serverId, channelId);
+                await _friendRepository.AlterExistingFriendTimeData(sessionGuid, userId, timestamp, serverId, channelId);
             }
             
             return new APIGatewayProxyResponse
