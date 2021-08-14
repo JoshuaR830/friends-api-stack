@@ -21,7 +21,7 @@ namespace BotuaFriendTime
         {
             var putTimeRequest = new PutItemRequest
             {
-                TableName = "FriendTimeTable",
+                TableName = "BotuaFriendTimeTable",
                 Item = new Dictionary<string, AttributeValue>
                 {
                     {"SessionGuid", new AttributeValue{S = sessionGuid}},
@@ -39,7 +39,7 @@ namespace BotuaFriendTime
         {
             var updateItemRequest = new UpdateItemRequest
             {
-                TableName = "FriendTimeTable",
+                TableName = "BotuaFriendTimeTable",
                 Key = new Dictionary<string, AttributeValue>
                 {
                     {
