@@ -28,6 +28,7 @@ namespace BotuaFriendTime
             _serviceCollection.AddDefaultAWSOptions(new AWSOptions());
             _serviceCollection.AddAWSService<IAmazonDynamoDB>();
             _serviceCollection.AddTransient<Handler>();
+            _serviceCollection.AddTransient<IFriendRepository, FriendRepository>();
         }
 
         public async Task<APIGatewayProxyResponse> FunctionHandlerAsync(APIGatewayProxyRequest input, ILambdaContext context)

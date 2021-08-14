@@ -9,11 +9,13 @@ namespace BotuaFriendTime
     public class Handler
     {
         private readonly IAmazonDynamoDB _dynamoDb;
+        private readonly IFriendRepository _friendRepository;
 
         
-        public Handler(IAmazonDynamoDB dynamoDb)
+        public Handler(IAmazonDynamoDB dynamoDb, IFriendRepository repository)
         {
             _dynamoDb = dynamoDb;
+            _friendRepository = repository;
         }
         
         /// <summary>
@@ -25,6 +27,7 @@ namespace BotuaFriendTime
         public async Task<APIGatewayProxyResponse> Handle (APIGatewayProxyRequest input)
         {
             
+            var sessionId = input.QueryStringParameters["sessionId"];
             var userId = long.Parse(input.QueryStringParameters["userId"]);
             var timestamp = long.Parse(input.QueryStringParameters["timestamp"]);
             var serverId = long.Parse(input.QueryStringParameters["serverId"]);
@@ -33,6 +36,15 @@ namespace BotuaFriendTime
 
             Console.WriteLine(userId);
             Console.WriteLine(timestamp);
+
+            if (connectionStatus)
+            {
+                await _friendRepository.PutNewFriendTimeData(sessionId, userId, timestamp, serverId, channelId);
+            }
+            else
+            {
+                await _friendRepository.AlterExistingFriendTimeData(sessionId, userId, timestamp, serverId, channelId);
+            }
             
             return new APIGatewayProxyResponse
             {
