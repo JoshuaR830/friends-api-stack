@@ -43,14 +43,14 @@ namespace BotuaFriendTime
                 Key = new Dictionary<string, AttributeValue>
                 {
                     {
-
-                        "UserId", new AttributeValue
+                        // This isn't the key anymore
+                        "SessionGuid", new AttributeValue
                         {
-                            N = userId.ToString()
+                            S = sessionGuid
                         }
                     }
                 },
-                ConditionExpression = "#SId = :sessionId",
+                // ConditionExpression = "#SId = :sessionId",
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                 {
                     {":timestamp", new AttributeValue {N = timestamp.ToString()}},
