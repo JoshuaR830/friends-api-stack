@@ -275,7 +275,7 @@ Resources:
         WriteCapacityUnits: 1
       TableName: "FriendImageTable"
 
-  FriendTimeTable:
+  BotuaFriendTimeTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -290,7 +290,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
-      TableName: "FriendTimeTable"
+      TableName: "BotuaFriendTimeTable"
 
   GetFriendImageFunctionRole:
     Type: AWS::IAM::Role
@@ -333,7 +333,7 @@ Resources:
                   - 'dynamodb:UpdateItem'
                 Resource: 
                   - 'arn:aws:dynamodb:*:*:table/FriendImageTable'
-                  - 'arn:aws:dynamodb:*:*:table/FriendTimeTable'
+                  - 'arn:aws:dynamodb:*:*:table/BotuaFriendTimeTable'
         - PolicyName: AmazonS3FullAccess
           PolicyDocument:
             Version: 2012-10-17
