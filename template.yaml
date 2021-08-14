@@ -275,22 +275,22 @@ Resources:
         WriteCapacityUnits: 1
       TableName: "FriendImageTable"
 
-  BotuaFriendTimeTable:
+  FriendTimeTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
         -
-          AttributeName: "UserId"
-          AttributeType: "N"
+          AttributeName: "SessionGuid"
+          AttributeType: "S"
       BillingMode: PROVISIONED
       KeySchema:
         -
-          AttributeName: "UserId"
+          AttributeName: "SessionGuid"
           KeyType: "HASH"
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
-      TableName: "BotuaFriendTimeTable"
+      TableName: "FriendTimeTable"
 
   GetFriendImageFunctionRole:
     Type: AWS::IAM::Role
@@ -333,7 +333,7 @@ Resources:
                   - 'dynamodb:UpdateItem'
                 Resource: 
                   - 'arn:aws:dynamodb:*:*:table/FriendImageTable'
-                  - 'arn:aws:dynamodb:*:*:table/BotuaFriendTimeTable'
+                  - 'arn:aws:dynamodb:*:*:table/FriendTimeTable'
         - PolicyName: AmazonS3FullAccess
           PolicyDocument:
             Version: 2012-10-17
