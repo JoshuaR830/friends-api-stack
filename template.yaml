@@ -281,7 +281,7 @@ Resources:
       AttributeDefinitions:
         -
           AttributeName: "UserId"
-          AttributeType: "S"
+          AttributeType: "N"
       BillingMode: PROVISIONED
       KeySchema:
         -
