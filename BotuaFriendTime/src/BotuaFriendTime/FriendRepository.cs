@@ -54,12 +54,10 @@ namespace BotuaFriendTime
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                 {
                     {":timestamp", new AttributeValue {N = timestamp.ToString()}},
-                    {":sessionId", new AttributeValue {S = sessionGuid}}
                 },
                 ExpressionAttributeNames = new Dictionary<string, string>
                 {
                     {"#ET", "EndTimestamp"},
-                    {"#SId", "SessionId"}
                 },
                 UpdateExpression = "SET #ET = :timestamp"
             };
