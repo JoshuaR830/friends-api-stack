@@ -12,7 +12,7 @@ namespace BotuaFriendTime
     {
         private IAmazonDynamoDB _dynamo;
 
-        FriendRepository(IAmazonDynamoDB dynamo)
+        public FriendRepository(IAmazonDynamoDB dynamo)
         {
             _dynamo = dynamo;
         }
