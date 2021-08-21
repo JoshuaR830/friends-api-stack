@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
+using BotuaGetFriendTimes.Helpers;
 using BotuaGetFriendTimes.Models;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace BotuaGetFriendTimes
 {
@@ -18,7 +21,37 @@ namespace BotuaGetFriendTimes
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
+            var days = int.Parse(input.QueryStringParameters["days"]);
 
+            var millis = days * TimeHelper.DayLengthMillis;
+
+            var currentMillis = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            var endTime = TimeHelper.GetEndOfDayMillis(TimeHelper.ConvertToDateTime(currentMillis - TimeHelper.DayLengthMillis));
+            var startTime = TimeHelper.GetStartOfDayMillis(TimeHelper.ConvertToDateTime(endTime - millis));
+
+            Console.WriteLine($"Start time {startTime}");
+            Console.WriteLine($"End time {endTime}");
+            
+            var duration = "day";
+
+            // var startTimeUnix = TimeHelper.ConvertDateStringToUnix(startTime);
+            // var endTimeUnix = TimeHelper.ConvertDateStringToUnix(endTime);
+
+            // ToDo: get the data from the DB between startTimeUnix and endTimeUnix
+            
+            var dateData = TimeHelper.ConvertToDateStringRange(startTime, endTime);
+            
+            // ToDo: Sort the date into daily chunks that can be used (between start and end times)
+
+            var dateLabels = new List<string>();
+            
+            foreach (var dateInstance in dateData)
+            {
+                dateLabels.Add(dateInstance.DateString);
+                Console.WriteLine(dateInstance.DateString);
+            }
+            
             Data data = new Data(
                 new List<string>
                 {
