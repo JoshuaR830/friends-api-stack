@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
@@ -22,6 +23,7 @@ namespace BotuaGetFriendTimes.Repositories
 
             do
             {
+                Console.WriteLine("Looping");
                 var scanRequest = new ScanRequest
                 {
                     Limit = 2,
@@ -36,18 +38,16 @@ namespace BotuaGetFriendTimes.Repositories
                         // ToDo: at some point pu the channel id in here - need to get it from a secure place though
                     },
                 };
-                
-                
-                
-                //ToDo if the last evaluated key has a value add it to the scan request so that it can get the rest
-                if (scanResponse?.LastEvaluatedKey != null)
+
+                if (scanResponse != null)
                 {
-                    scanRequest.ExclusiveStartKey = scanResponse?.LastEvaluatedKey;
+                    if (scanResponse.LastEvaluatedKey.ContainsKey("SessionGuid"))
+                    {
+                        scanRequest.ExclusiveStartKey = scanResponse.LastEvaluatedKey;
+                    }
                 }
-
-                scanResponse = await _dynamoDb.ScanAsync(scanRequest);
                 
-
+                scanResponse = await _dynamoDb.ScanAsync(scanRequest);
 
                 var scanResponseItems = scanResponse.Items;
                 foreach (var item in scanResponseItems)
@@ -62,8 +62,9 @@ namespace BotuaGetFriendTimes.Repositories
 
                     timeItems.Add(new TimeItem(sessionGuid, channelId, endTimestamp, startTimestamp, serverId, userId));
                 }
-            } while (scanResponse.LastEvaluatedKey != null);
-            
+            } while (scanResponse.LastEvaluatedKey.ContainsKey("SessionGuid"));
+
+            Console.WriteLine($"Item count {timeItems.Count}");
 
             return timeItems;
         }
