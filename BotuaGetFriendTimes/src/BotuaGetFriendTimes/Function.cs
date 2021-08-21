@@ -6,6 +6,7 @@ using Amazon.DynamoDBv2;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using BotuaGetFriendTimes.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -29,7 +30,7 @@ namespace BotuaGetFriendTimes
             _serviceCollection.AddDefaultAWSOptions(new AWSOptions());
             _serviceCollection.AddAWSService<IAmazonDynamoDB>();
             _serviceCollection.AddTransient<Handler>();
-            
+            _serviceCollection.AddTransient<ITimeRepository, TimeRepository>();
         }
         
         /// <summary>

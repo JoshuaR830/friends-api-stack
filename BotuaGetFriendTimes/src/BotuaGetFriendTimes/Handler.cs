@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
 using BotuaGetFriendTimes.Helpers;
 using BotuaGetFriendTimes.Models;
+using BotuaGetFriendTimes.Repositories;
 using Microsoft.VisualBasic.CompilerServices;
 
 namespace BotuaGetFriendTimes
 {
     public class Handler
     {
-        private readonly IAmazonDynamoDB _dynamoDb;
+        private readonly ITimeRepository _timeRepository;
     
-        public Handler(IAmazonDynamoDB dynamoDb)
+        public Handler(ITimeRepository timeRepository)
         {
-            _dynamoDb = dynamoDb;
+            _timeRepository = timeRepository;
         }
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
@@ -52,7 +54,14 @@ namespace BotuaGetFriendTimes
                 dateLabels.Add(dateInstance.DateString);
                 Console.WriteLine(dateInstance.DateString);
             }
-            
+
+            var timeScan = (await _timeRepository.GetTimeByTimeRange(startTime, endTime)).ToList();
+
+            foreach (var item in timeScan)
+            {
+                Console.WriteLine(item.SessionId);
+            }
+
             Data data = new Data(
                 dateLabels,
                 new List<Dataset>
