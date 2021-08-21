@@ -22,6 +22,7 @@ namespace BotuaGetFriendTimes
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
             var days = int.Parse(input.QueryStringParameters["days"]);
+            days--;
 
             var millis = days * TimeHelper.DayLengthMillis;
 
