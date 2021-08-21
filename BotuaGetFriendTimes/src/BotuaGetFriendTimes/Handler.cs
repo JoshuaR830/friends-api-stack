@@ -54,16 +54,8 @@ namespace BotuaGetFriendTimes
             }
             
             Data data = new Data(
-                new List<string>
-                {
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday"
-                }, new List<Dataset>
+                dateLabels,
+                new List<Dataset>
                 {
                     new Dataset("Andrew", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
                     new Dataset("Dayle", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
