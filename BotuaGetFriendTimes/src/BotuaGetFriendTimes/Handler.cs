@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
 using BotuaGetFriendTimes.Helpers;
 using BotuaGetFriendTimes.Models;
 using BotuaGetFriendTimes.Repositories;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace BotuaGetFriendTimes
 {
