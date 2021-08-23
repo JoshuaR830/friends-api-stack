@@ -114,6 +114,8 @@ namespace BotuaGetFriendTimes
             }
 
             var userIds = timeScan.Select(x => x.UserId).Distinct().ToList();
+
+            Console.WriteLine($"There are {userIds.Count} user Id's");
             var dataset = new List<Dataset>();
 
             foreach (var userId in userIds)
@@ -122,7 +124,7 @@ namespace BotuaGetFriendTimes
                 var specificUserEndList = userEndTimeList[userId];
 
                 var firstTime = specificUserStartList[0];
-                var lastTime = specificUserEndList[-1];
+                var lastTime = specificUserEndList[^1];
 
                 // This is the number of days to calculate
                 var difference = lastTime - firstTime;
@@ -141,7 +143,9 @@ namespace BotuaGetFriendTimes
                     // Get today's start and end times
                     var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay).ToList();
                     var endTimesForToday = specificUserStartList.Where(x => x <= specificEndDay).ToList();
-                    
+
+                    Console.WriteLine($"Start: {startTimesForToday.Count}, End: {endTimesForToday.Count} Equal: {startTimesForToday.Count == endTimesForToday.Count}");
+
                     if (startTimesForToday.Count == endTimesForToday.Count)
                     {
                         var hoursOnline = 0d;
@@ -153,8 +157,10 @@ namespace BotuaGetFriendTimes
                             
                             // Add up the hours online for if multiple sessions in a day
                             hoursOnline += TimeHelper.ConvertToHours(sessionTimeMillis);
+                            
                         }
                         
+                        Console.WriteLine($"Hours online {hoursOnline} stored");
                         userTimes.Add(hoursOnline);
                     }
                 }

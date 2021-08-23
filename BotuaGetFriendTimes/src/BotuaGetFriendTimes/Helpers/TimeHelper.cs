@@ -73,6 +73,7 @@ namespace BotuaGetFriendTimes.Helpers
 
         public static double ConvertToHours(long timeMillis)
         {
+            Console.WriteLine($"Doing division {timeMillis} / 3600000d = {timeMillis / 3600000d}");
             return timeMillis / 3600000d;
         }
     }
