@@ -16,7 +16,16 @@ namespace BotuaGetFriendTimes
     {
         private readonly ITimeRepository _timeRepository;
         private readonly IAmazonSimpleSystemsManagement _ssm;
-    
+        private long _jordanDiscordId;
+        private long _joshuaDiscordId;
+        private long _dayleDiscordId;
+        private long _madalynDiscordId;
+        private long _jonnyDiscordId;
+        private long _lucasDiscordId;
+        private long _callanDiscordId;
+        private long _andrewDiscordId;
+        private long _martinDiscordId;
+
         public Handler(ITimeRepository timeRepository, IAmazonSimpleSystemsManagement ssm)
         {
             _timeRepository = timeRepository;
@@ -25,6 +34,16 @@ namespace BotuaGetFriendTimes
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
+            _jordanDiscordId = await GetSSMValue("JordanId");
+            _joshuaDiscordId = await GetSSMValue("JoshuaId");
+            _dayleDiscordId = await GetSSMValue("DayleId");
+            _madalynDiscordId = await GetSSMValue("DeclynId");
+            _jonnyDiscordId = await GetSSMValue("JonnyId");
+            _lucasDiscordId = await GetSSMValue("LucasId");
+            _callanDiscordId = await GetSSMValue("CallanId");
+            _andrewDiscordId = await GetSSMValue("AndrewId");
+            _martinDiscordId = await GetSSMValue("MartinId");
+            
             var days = int.Parse(input.QueryStringParameters["days"]);
             days--;
 
@@ -160,40 +179,27 @@ namespace BotuaGetFriendTimes
                             
                             // Add up the hours online for if multiple sessions in a day
                             hoursOnline += TimeHelper.ConvertToHours(sessionTimeMillis);
-                            
                         }
                         
                         Console.WriteLine($"Hours online {hoursOnline} stored");
                         userTimes.Add(hoursOnline);
                     }
                 }
-
-
-
-                long jordanDiscordId = await GetSSMValue("JordanId");
-                long joshuaDiscordId = await GetSSMValue("JoshuaId");
-                long dayleDiscordId = await GetSSMValue("DayleId");
-                long madalynDiscordId = await GetSSMValue("DeclynId");
-                long jonnyDiscordId = await GetSSMValue("JonnyId");
-                long lucasDiscordId = await GetSSMValue("LucasId");
-                long callanDiscordId = await GetSSMValue("CallanId");
-                long andrewDiscordId = await GetSSMValue("AndrewId");
-                long martinDiscordId = await GetSSMValue("MartinId");
-
+                
                 var colors = new Dictionary<long, string>
                 {
-                    {jordanDiscordId, "rgba(143, 164, 199, 0.5)"},
-                    {joshuaDiscordId, "rgba(149, 0, 255, 0.5)"},
-                    {dayleDiscordId, "rgba(21, 128, 11, 0.5)"},
-                    {madalynDiscordId, "rgba(238, 255, 0, 0.5)"},
-                    {jonnyDiscordId, "rgba(252, 3, 202, 0.5)"},
-                    {lucasDiscordId, "rgba(158, 14, 14, 0.5)"},
-                    {callanDiscordId, "rgba(255, 111, 0, 0.5)"},
-                    {andrewDiscordId, "rgba(158, 132, 14, 0.5)"},
-                    {martinDiscordId, "rgba(201, 16, 118, 0.5)"}
+                    {_jordanDiscordId, "rgba(143, 164, 199, 0.5)"},
+                    {_joshuaDiscordId, "rgba(149, 0, 255, 0.5)"},
+                    {_dayleDiscordId, "rgba(21, 128, 11, 0.5)"},
+                    {_madalynDiscordId, "rgba(238, 255, 0, 0.5)"},
+                    {_jonnyDiscordId, "rgba(252, 3, 202, 0.5)"},
+                    {_lucasDiscordId, "rgba(158, 14, 14, 0.5)"},
+                    {_callanDiscordId, "rgba(255, 111, 0, 0.5)"},
+                    {_andrewDiscordId, "rgba(158, 132, 14, 0.5)"},
+                    {_martinDiscordId, "rgba(201, 16, 118, 0.5)"}
                 };
 
-                dataset.Add(new Dataset(userId.ToString(), userTimes, colors[userId]));
+                dataset.Add(new Dataset(GetNameById(userId), userTimes, colors[userId]));
 
                 dataset = dataset.OrderBy(x => x.Label).ToList();
             }
@@ -219,6 +225,38 @@ namespace BotuaGetFriendTimes
             {
                 Name = parameterName
             })).Parameter.Value);
+        }
+
+        private string GetNameById(long id)
+        {
+            if (id == _jordanDiscordId)
+                return "Jordan";
+            
+            if (id == _joshuaDiscordId)
+                return "Joshua";
+            
+            if (id == _dayleDiscordId)
+                return "Dayle";
+            
+            if (id == _madalynDiscordId)
+                return "Maddie";
+            
+            if (id == _jonnyDiscordId)
+                return "Jonny";
+            
+            if (id == _lucasDiscordId)
+                return "Lucas";
+            
+            if (id == _callanDiscordId)
+                return "Callan";
+            
+            if (id == _andrewDiscordId)
+                return "Andrew";
+            
+            if (id == _martinDiscordId)
+                return "Martin";
+
+            return "Other";
         }
     }
 }
