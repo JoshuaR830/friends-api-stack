@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 using Amazon.Lambda.APIGatewayEvents;
+using Amazon.SimpleSystemsManagement;
+using Amazon.SimpleSystemsManagement.Model;
 using BotuaGetFriendTimes.Helpers;
 using BotuaGetFriendTimes.Models;
 using BotuaGetFriendTimes.Repositories;
@@ -14,10 +15,12 @@ namespace BotuaGetFriendTimes
     public class Handler
     {
         private readonly ITimeRepository _timeRepository;
+        private readonly IAmazonSimpleSystemsManagement _ssm;
     
-        public Handler(ITimeRepository timeRepository)
+        public Handler(ITimeRepository timeRepository, IAmazonSimpleSystemsManagement ssm)
         {
             _timeRepository = timeRepository;
+            _ssm = ssm;
         }
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
@@ -164,8 +167,35 @@ namespace BotuaGetFriendTimes
                         userTimes.Add(hoursOnline);
                     }
                 }
-                
-                dataset.Add(new Dataset(userId.ToString(), userTimes));
+
+
+
+                long jordanDiscordId = await GetSSMValue("JordanId");
+                long joshuaDiscordId = await GetSSMValue("JoshuaId");
+                long dayleDiscordId = await GetSSMValue("DayleId");
+                long madalynDiscordId = await GetSSMValue("DeclynId");
+                long jonnyDiscordId = await GetSSMValue("JonnyId");
+                long lucasDiscordId = await GetSSMValue("LucasId");
+                long callanDiscordId = await GetSSMValue("CallanId");
+                long andrewDiscordId = await GetSSMValue("AndrewId");
+                long martinDiscordId = await GetSSMValue("MartinId");
+
+                var colors = new Dictionary<long, string>
+                {
+                    {jordanDiscordId, "rgba(143, 164, 199, 0.5)"},
+                    {joshuaDiscordId, "rgba(149, 0, 255, 0.5)"},
+                    {dayleDiscordId, "rgba(21, 128, 11, 0.5)"},
+                    {madalynDiscordId, "rgba(238, 255, 0, 0.5)"},
+                    {jonnyDiscordId, "rgba(252, 3, 202, 0.5)"},
+                    {lucasDiscordId, "rgba(158, 14, 14, 0.5)"},
+                    {callanDiscordId, "rgba(255, 111, 0, 0.5)"},
+                    {andrewDiscordId, "rgba(158, 132, 14, 0.5)"},
+                    {martinDiscordId, "rgba(201, 16, 118, 0.5)"}
+                };
+
+                dataset.Add(new Dataset(userId.ToString(), userTimes, colors[userId]));
+
+                dataset = dataset.OrderBy(x => x.Label).ToList();
             }
 
             Data data = new Data(
@@ -181,6 +211,14 @@ namespace BotuaGetFriendTimes
                 Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
                 Body = serialisedData
             };
+        }
+
+        private async Task<long> GetSSMValue(string parameterName)
+        {
+            return Convert.ToInt64((await _ssm.GetParameterAsync(new GetParameterRequest
+            {
+                Name = parameterName
+            })).Parameter.Value);
         }
     }
 }

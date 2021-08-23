@@ -8,13 +8,11 @@ namespace BotuaFriendTime
 {
     public class Handler
     {
-        private readonly IAmazonDynamoDB _dynamoDb;
         private readonly IFriendRepository _friendRepository;
 
         
-        public Handler(IAmazonDynamoDB dynamoDb, IFriendRepository repository)
+        public Handler(IFriendRepository repository)
         {
-            _dynamoDb = dynamoDb;
             _friendRepository = repository;
         }
         
