@@ -141,8 +141,8 @@ namespace BotuaGetFriendTimes
                     var specificEndDay = dataPoint.EndOfDay;
                     
                     // Get today's start and end times
-                    var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay).ToList();
-                    var endTimesForToday = specificUserEndList.Where(x => x <= specificEndDay).ToList();
+                    var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
+                    var endTimesForToday = specificUserEndList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
 
                     Console.WriteLine($"Start: {startTimesForToday.Count}, End: {endTimesForToday.Count} Equal: {startTimesForToday.Count == endTimesForToday.Count}");
 
