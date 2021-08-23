@@ -18,6 +18,9 @@ namespace BotuaGetFriendTimes.Models
         
         [JsonPropertyName("strokeColor")]
         public string StrokeColor { get; set; }
+        
+        [JsonPropertyName("backgroundColor")]
+        public string BackgroundColor { get; set; }
 
         public Dataset(string label, List<double> data, string color)
         {
@@ -25,6 +28,7 @@ namespace BotuaGetFriendTimes.Models
             Data = data;
             FillColor = color;
             StrokeColor = color;
+            BackgroundColor = color;
         }
     }
 }
