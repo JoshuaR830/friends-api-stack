@@ -23,10 +23,8 @@ namespace BotuaGetFriendTimes.Repositories
 
             do
             {
-                Console.WriteLine("Looping");
                 var scanRequest = new ScanRequest
                 {
-                    Limit = 2,
                     TableName = "FriendTimeTable",
                     FilterExpression = "#ST >= :startTimestamp AND #ET <= :endTimestamp",
                     ExpressionAttributeNames = new Dictionary<string, string>
@@ -63,8 +61,6 @@ namespace BotuaGetFriendTimes.Repositories
                     timeItems.Add(new TimeItem(sessionGuid, channelId, endTimestamp, startTimestamp, serverId, userId));
                 }
             } while (scanResponse.LastEvaluatedKey.ContainsKey("SessionGuid"));
-
-            Console.WriteLine($"Item count {timeItems.Count}");
 
             return timeItems;
         }

@@ -70,5 +70,10 @@ namespace BotuaGetFriendTimes.Helpers
 
             return dateStringRange;
         }
+
+        public static double ConvertToHours(long timeMillis)
+        {
+            return timeMillis / 3600000d;
+        }
     }
 }

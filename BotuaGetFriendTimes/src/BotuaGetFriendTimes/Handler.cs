@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Amazon.Lambda.APIGatewayEvents;
 using BotuaGetFriendTimes.Helpers;
 using BotuaGetFriendTimes.Models;
@@ -55,24 +56,115 @@ namespace BotuaGetFriendTimes
 
             var timeScan = (await _timeRepository.GetTimeByTimeRange(startTime, endTime)).ToList();
 
+            var orderedTimes = timeScan.OrderBy(x => x.StartTimestamp).ToList();
+
+            var userStartTimeList = new Dictionary<long, List<long>>();
+            var userEndTimeList = new Dictionary<long, List<long>>();
+            
             foreach (var item in timeScan)
             {
                 Console.WriteLine(item.SessionId);
+
+                var sessionStarts = new List<long>();
+                var sessionEnds = new List<long>();
+
+
+                var sessionStart = item.StartTimestamp;
+                var sessionEnd = item.EndTimestamp;
+
+                var endOfDayMillis = TimeHelper.GetEndOfDayMillis(TimeHelper.ConvertToDateTime(sessionStart));
+
+                // Add the start time
+                sessionStarts.Add(sessionStart);
+
+                // Split up a session that could be longer than a day into day sized chunks
+                while (sessionEnd > endOfDayMillis)
+                {
+                    sessionEnds.Add(endOfDayMillis);
+
+                    // Add 1 to make it the next day (midnight)
+                    sessionStart = endOfDayMillis + 1;
+                    sessionStarts.Add(sessionStart);
+
+                    // Move on to the next day maximum session length
+                    endOfDayMillis += TimeHelper.DayLengthMillis;
+                }
+
+                // Add the end time
+                sessionEnds.Add(sessionEnd);
+
+                // Keep a list of all the session times for users
+                if (userStartTimeList.ContainsKey(item.UserId))
+                {
+                    userStartTimeList[item.UserId].AddRange(sessionStarts);
+                }
+                else
+                {
+                    userStartTimeList.Add(item.UserId, sessionStarts);
+                }
+
+                if (userEndTimeList.ContainsKey(item.UserId))
+                {
+                    userEndTimeList[item.UserId].AddRange(sessionEnds);
+                }
+                else
+                {
+                    userEndTimeList.Add(item.UserId, sessionEnds);
+                }
+            }
+
+            var userIds = timeScan.Select(x => x.UserId).Distinct().ToList();
+            var dataset = new List<Dataset>();
+
+            foreach (var userId in userIds)
+            {
+                var specificUserStartList = userStartTimeList[userId];
+                var specificUserEndList = userEndTimeList[userId];
+
+                var firstTime = specificUserStartList[0];
+                var lastTime = specificUserEndList[-1];
+
+                // This is the number of days to calculate
+                var difference = lastTime - firstTime;
+
+                // Todo - loop through everything in those time ranges
+                // ToDo - need to know the differences between them
+                // ToDo: Need to be able to collate the time and convert to hours
+
+                var userTimes = new List<double>(); 
+                
+                foreach (var dataPoint in dateData)
+                {
+                    var specificStartDay = dataPoint.StartOfDay;
+                    var specificEndDay = dataPoint.EndOfDay;
+                    
+                    // Get today's start and end times
+                    var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay).ToList();
+                    var endTimesForToday = specificUserStartList.Where(x => x <= specificEndDay).ToList();
+                    
+                    if (startTimesForToday.Count == endTimesForToday.Count)
+                    {
+                        var hoursOnline = 0d;
+                        
+                        for (int i = 0; i < startTimesForToday.Count; i++)
+                        {
+                            // Work out how many hours for each session
+                            var sessionTimeMillis = endTimesForToday[i] - startTimesForToday[i];
+                            
+                            // Add up the hours online for if multiple sessions in a day
+                            hoursOnline += TimeHelper.ConvertToHours(sessionTimeMillis);
+                        }
+                        
+                        userTimes.Add(hoursOnline);
+                    }
+                }
+                
+                dataset.Add(new Dataset(userId.ToString(), userTimes));
             }
 
             Data data = new Data(
                 dateLabels,
-                new List<Dataset>
-                {
-                    new Dataset("Andrew", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Dayle", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Jonny", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Jordan", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Joshua", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Lucas", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Madalyn", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                    new Dataset("Martin", new List<double> { 1.5, 2, 3, 2, 3, 5, 1 }),
-                }
+                dataset
             );
 
             var serialisedData = JsonSerializer.Serialize(data);
