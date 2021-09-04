@@ -9,9 +9,9 @@ namespace BotuaGetFriendTimes.Models
         public BarData BarBarGraph { get; set; }
         
         [JsonPropertyName("pieChart")]
-        public PieData PieBarChart { get; set; }
+        public PieChart PieBarChart { get; set; }
      
-        public Charts(BarData barBarData, PieData pieBarData)
+        public Charts(BarData barBarData, PieChart pieBarData)
         {
             BarBarGraph = barBarData;
             PieBarChart = pieBarData;

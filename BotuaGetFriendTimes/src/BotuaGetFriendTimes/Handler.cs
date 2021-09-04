@@ -223,9 +223,9 @@ namespace BotuaGetFriendTimes
             
             var pieDataset = new PieDataset(pieDataPoints, pieColors);
             
-            var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset}, new PieOptions(new PiePlugin(new PieDataLabels(false))));
-
-            var charts = new Charts(barData, pieData);
+            var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
+            var charts = new Charts(barData, pieChart);
             
             var serialisedData = JsonSerializer.Serialize(charts);
             

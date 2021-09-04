@@ -12,14 +12,10 @@ namespace BotuaGetFriendTimes.Models
         [JsonPropertyName("datasets")]
         public List<PieDataset> Datasets { get; set; }
 
-        [JsonPropertyName("options")] 
-        public PieOptions Options { get; set; }
-
-        public PieData(List<string> labels, List<PieDataset> datasets, PieOptions options)
+        public PieData(List<string> labels, List<PieDataset> datasets)
         {
             Labels = labels;
             Datasets = datasets;
-            Options = options;
         }
     }
 }
