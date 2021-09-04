@@ -3,18 +3,22 @@ using ThirdParty.Json.LitJson;
 
 namespace BotuaGetFriendTimes.Models
 {
-    public class Charts
+    public class Response
     {
         [JsonPropertyName("barGraph")]
-        public BarData BarBarGraph { get; set; }
+        public BarGraph BarBarGraph { get; set; }
         
         [JsonPropertyName("pieChart")]
         public PieChart PieBarChart { get; set; }
+        
+        [JsonPropertyName("champion")]
+        public Champion Champion { get; set; }
      
-        public Charts(BarData barBarData, PieChart pieBarData)
+        public Response(BarGraph barBarData, PieChart pieBarData, Champion champion)
         {
             BarBarGraph = barBarData;
             PieBarChart = pieBarData;
+            Champion = champion;
         }
     }
 }

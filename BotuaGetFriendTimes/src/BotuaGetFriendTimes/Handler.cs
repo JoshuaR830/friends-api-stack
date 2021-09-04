@@ -225,7 +225,12 @@ namespace BotuaGetFriendTimes
             
             var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
             var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
-            var charts = new Charts(barData, pieChart);
+            var barGraph = new BarGraph(barData);
+
+
+            var orderedPieData = preliminaryPieData.OrderByDescending(x => x.Data[0]).ToList();
+            var champion = new Champion(orderedPieData[0].Label, orderedPieData[0].BackgroundColor, orderedPieData[0].Data[0]);
+            var charts = new Response(barGraph, pieChart, champion);
             
             var serialisedData = JsonSerializer.Serialize(charts);
             
