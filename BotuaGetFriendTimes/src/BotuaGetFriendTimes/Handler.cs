@@ -223,7 +223,7 @@ namespace BotuaGetFriendTimes
             
             var pieDataset = new PieDataset(pieDataPoints, pieColors);
             
-            var pieData = new PieData(pieDataLabels, pieDataset);
+            var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
 
             var charts = new Charts(barData, pieData);
             
