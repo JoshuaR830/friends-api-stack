@@ -204,7 +204,7 @@ namespace BotuaGetFriendTimes
 
                 barDataset = barDataset.OrderBy(x => x.Label).ToList();
 
-                preliminaryPieData.Add(new BarDataset(GetNameById(userId), new List<double> {userTimes.Sum()}, colors[userId]));
+                preliminaryPieData.Add(new BarDataset(GetNameById(userId), new List<double> {Math.Round(userTimes.Sum(), 2, MidpointRounding.AwayFromZero)}, colors[userId]));
                 preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
             }
 
