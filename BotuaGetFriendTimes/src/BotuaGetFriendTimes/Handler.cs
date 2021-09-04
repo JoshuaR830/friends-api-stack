@@ -221,7 +221,7 @@ namespace BotuaGetFriendTimes
                 pieColors.Add(x.BackgroundColor);
             });
             
-            var pieDataset = new PieDataset("Collated time", pieDataPoints, pieColors);
+            var pieDataset = new PieDataset(pieDataPoints, pieColors);
             
             var pieData = new PieData(pieDataLabels, pieDataset);
 
