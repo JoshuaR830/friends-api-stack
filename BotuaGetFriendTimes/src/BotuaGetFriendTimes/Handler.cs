@@ -208,7 +208,7 @@ namespace BotuaGetFriendTimes
                 preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
             }
 
-            var barData = new Data(barDateLabels, new List<IDataset>(barDataset));
+            var barData = new BarData(barDateLabels, barDataset);
 
             var pieDataLabels = preliminaryPieData.Select(x => x.Label).ToList();
 
@@ -223,7 +223,7 @@ namespace BotuaGetFriendTimes
             
             var pieDataset = new PieDataset("Collated time", pieDataPoints, pieColors);
             
-            var pieData = new Data(pieDataLabels, new List<IDataset> {pieDataset});
+            var pieData = new PieData(pieDataLabels, pieDataset);
 
             var charts = new Charts(barData, pieData);
             

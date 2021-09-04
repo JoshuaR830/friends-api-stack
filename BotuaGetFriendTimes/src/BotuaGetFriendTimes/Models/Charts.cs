@@ -6,15 +6,15 @@ namespace BotuaGetFriendTimes.Models
     public class Charts
     {
         [JsonPropertyName("barGraph")]
-        public Data BarGraph { get; set; }
+        public BarData BarBarGraph { get; set; }
         
         [JsonPropertyName("pieChart")]
-        public Data PieChart { get; set; }
+        public PieData PieBarChart { get; set; }
      
-        public Charts(Data barData, Data pieData)
+        public Charts(BarData barBarData, PieData pieBarData)
         {
-            BarGraph = barData;
-            PieChart = pieData;
+            BarBarGraph = barBarData;
+            PieBarChart = pieBarData;
         }
     }
 }

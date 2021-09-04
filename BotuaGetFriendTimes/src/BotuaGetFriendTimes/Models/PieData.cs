@@ -4,15 +4,15 @@ using System.Text.Json.Serialization;
 
 namespace BotuaGetFriendTimes.Models
 {
-    public class Data
+    public class PieData
     {
         [JsonPropertyName("labels")]
         public List<string> Labels { get; set; }
         
         [JsonPropertyName("datasets")]
-        public List<IDataset> Datasets { get; set; }
+        public PieDataset Datasets { get; set; }
 
-        public Data(List<string> labels, List<IDataset> datasets)
+        public PieData(List<string> labels, PieDataset datasets)
         {
             Labels = labels;
             Datasets = datasets;
