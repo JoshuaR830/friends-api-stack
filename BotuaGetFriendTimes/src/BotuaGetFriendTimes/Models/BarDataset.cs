@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace BotuaGetFriendTimes.Models
 {
-    public class Dataset
+    public class BarDataset : IDataset
     {
         [JsonPropertyName("label")]
         public string Label { get; set; }
@@ -20,7 +20,7 @@ namespace BotuaGetFriendTimes.Models
         [JsonPropertyName("backgroundColor")]
         public string BackgroundColor { get; set; }
 
-        public Dataset(string label, List<double> data, string color)
+        public BarDataset(string label, List<double> data, string color)
         {
             Label = label;
             Data = data;

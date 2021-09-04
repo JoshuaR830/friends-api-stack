@@ -138,8 +138,8 @@ namespace BotuaGetFriendTimes
             var userIds = timeScan.Select(x => x.UserId).Distinct().ToList();
 
             Console.WriteLine($"There are {userIds.Count} user Id's");
-            var barDataset = new List<Dataset>();
-            var pieDataset = new List<Dataset>();
+            var barDataset = new List<BarDataset>();
+            var preliminaryPieData = new List<BarDataset>();
 
             foreach (var userId in userIds)
             {
@@ -200,19 +200,30 @@ namespace BotuaGetFriendTimes
                     {_martinDiscordId, "rgba(201, 16, 118, 0.5)"}
                 };
 
-                barDataset.Add(new Dataset(GetNameById(userId), userTimes, colors[userId]));
+                barDataset.Add(new BarDataset(GetNameById(userId), userTimes, colors[userId]));
 
                 barDataset = barDataset.OrderBy(x => x.Label).ToList();
 
-                pieDataset.Add(new Dataset(GetNameById(userId), new List<double> {userTimes.Sum()}, colors[userId]));
-                pieDataset = pieDataset.OrderBy(x => x.Label).ToList();
+                preliminaryPieData.Add(new BarDataset(GetNameById(userId), new List<double> {userTimes.Sum()}, colors[userId]));
+                preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
             }
 
-            var barData = new Data(barDateLabels, barDataset);
+            var barData = new Data(barDateLabels, new List<IDataset>(barDataset));
 
-            var pieDataLabels = pieDataset.Select(x => x.Label).ToList(); 
+            var pieDataLabels = preliminaryPieData.Select(x => x.Label).ToList();
+
+            var pieDataPoints = new List<double>();
+            var pieColors = new List<string>();
             
-            var pieData = new Data(pieDataLabels, pieDataset);
+            preliminaryPieData.ForEach(x =>
+            {
+                pieDataPoints.Add(x.Data[0]);
+                pieColors.Add(x.BackgroundColor);
+            });
+            
+            var pieDataset = new PieDataset("Collated time", pieDataPoints, pieColors);
+            
+            var pieData = new Data(pieDataLabels, new List<IDataset> {pieDataset});
 
             var charts = new Charts(barData, pieData);
             

@@ -10,9 +10,9 @@ namespace BotuaGetFriendTimes.Models
         public List<string> Labels { get; set; }
         
         [JsonPropertyName("datasets")]
-        public List<Dataset> Datasets { get; set; }
+        public List<IDataset> Datasets { get; set; }
 
-        public Data(List<string> labels, List<Dataset> datasets)
+        public Data(List<string> labels, List<IDataset> datasets)
         {
             Labels = labels;
             Datasets = datasets;
