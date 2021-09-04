@@ -210,7 +210,9 @@ namespace BotuaGetFriendTimes
 
             var barData = new Data(barDateLabels, barDataset);
 
-            var pieData = new Data(barDateLabels, pieDataset);
+            var pieDataLabels = pieDataset.Select(x => x.Label).ToList(); 
+            
+            var pieData = new Data(pieDataLabels, pieDataset);
 
             var charts = new Charts(barData, pieData);
             
