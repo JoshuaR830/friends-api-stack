@@ -68,11 +68,11 @@ namespace BotuaGetFriendTimes
             
             // ToDo: Sort the date into daily chunks that can be used (between start and end times)
 
-            var dateLabels = new List<string>();
+            var barDateLabels = new List<string>();
             
             foreach (var dateInstance in dateData)
             {
-                dateLabels.Add(dateInstance.DateString);
+                barDateLabels.Add(dateInstance.DateString);
                 Console.WriteLine(dateInstance.DateString);
             }
 
@@ -138,7 +138,8 @@ namespace BotuaGetFriendTimes
             var userIds = timeScan.Select(x => x.UserId).Distinct().ToList();
 
             Console.WriteLine($"There are {userIds.Count} user Id's");
-            var dataset = new List<Dataset>();
+            var barDataset = new List<Dataset>();
+            var pieDataset = new List<Dataset>();
 
             foreach (var userId in userIds)
             {
@@ -199,17 +200,25 @@ namespace BotuaGetFriendTimes
                     {_martinDiscordId, "rgba(201, 16, 118, 0.5)"}
                 };
 
-                dataset.Add(new Dataset(GetNameById(userId), userTimes, colors[userId]));
+                barDataset.Add(new Dataset(GetNameById(userId), userTimes, colors[userId]));
 
-                dataset = dataset.OrderBy(x => x.Label).ToList();
+                barDataset = barDataset.OrderBy(x => x.Label).ToList();
+
+                pieDataset.Add(new Dataset(GetNameById(userId), new List<double> {userTimes.Sum()}, colors[userId]));
+                pieDataset = pieDataset.OrderBy(x => x.Label).ToList();
             }
 
-            Data data = new Data(
-                dateLabels,
-                dataset
-            );
+            var barData = new Data(barDateLabels, barDataset);
 
-            var serialisedData = JsonSerializer.Serialize(data);
+            var pieData = new Data(barDateLabels, pieDataset);
+
+            var charts = new Charts(barData, pieData);
+            
+            var serialisedData = JsonSerializer.Serialize(charts);
+            
+            // ToDo - Work out the most time
+            // ToDo - work out the streak
+            // ToDo - work out the average
             
             return new APIGatewayProxyResponse
             {
