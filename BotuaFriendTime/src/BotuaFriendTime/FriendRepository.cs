@@ -29,7 +29,7 @@ namespace BotuaFriendTime
                     {"ServerId", new AttributeValue{N = serverId.ToString()}},
                     {"ChannelId", new AttributeValue{N = channelId.ToString()}},
                     {"StartTimestamp", new AttributeValue{N = timestamp.ToString()}},
-                    {"ChanelName", new AttributeValue{S = channelName}},
+                    {"ChannelName", new AttributeValue{S = channelName}},
                     {"IsStreaming", new AttributeValue{S = isStreaming.ToString()}},
                     {"IsVideoOn", new AttributeValue{S = isVideoOn.ToString()}},
                     {"IsMuted", new AttributeValue{S = isMuted.ToString()}},
