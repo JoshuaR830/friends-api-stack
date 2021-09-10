@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -76,7 +77,9 @@ namespace BotuaGetFriendTimes
                 Console.WriteLine(dateInstance.DateString);
             }
 
-            var timeScan = (await _timeRepository.GetTimeByTimeRange(startTime, endTime)).ToList();
+            var rawTimeScan = (await _timeRepository.GetTimeByTimeRange(startTime, endTime)).ToList();
+
+            var timeScan = FilterItems(rawTimeScan);
 
             var orderedTimes = timeScan.OrderBy(x => x.StartTimestamp).ToList();
 
@@ -244,6 +247,11 @@ namespace BotuaGetFriendTimes
                 Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
                 Body = serialisedData
             };
+        }
+
+        private IEnumerable<TimeItem> FilterItems(List<TimeItem> rawTimeScan)
+        {
+            return rawTimeScan.Where(x => !x.IsAfk && !x.IsDeafened && !x.IsMuted);
         }
 
         private async Task<long> GetSSMValue(string parameterName)

@@ -58,11 +58,31 @@ namespace BotuaGetFriendTimes.Repositories
                     var serverId = item["ServerId"].N;
                     var userId = item["UserId"].N;
 
-                    timeItems.Add(new TimeItem(sessionGuid, channelId, endTimestamp, startTimestamp, serverId, userId));
+                    var channelName = GetStringValue(item, "ChannelName") ?? "";
+                    var isAfk = TryConvertToBool(GetStringValue(item, "IsAfk"), false);
+                    var isMuted = TryConvertToBool(GetStringValue(item, "IsMuted"), false);
+                    var isDeafened = TryConvertToBool(GetStringValue(item, "IsDeafened"), false);
+                    var isVideoOn = TryConvertToBool(GetStringValue(item, "IsVideoOn"), false);
+                    var isStreaming = TryConvertToBool(GetStringValue(item, "IsStreaming"), false);
+
+                    timeItems.Add(new TimeItem(sessionGuid, channelId, endTimestamp, startTimestamp, serverId, userId, channelName, isAfk, isMuted, isDeafened, isVideoOn, isStreaming));
                 }
             } while (scanResponse.LastEvaluatedKey.ContainsKey("SessionGuid"));
 
             return timeItems;
+        }
+
+        private bool TryConvertToBool(string @string, bool @bool)
+        {
+            return @string != null ? bool.Parse(@string) : @bool;
+        }
+
+        private string GetStringValue(Dictionary<string, AttributeValue> item, string key)
+        {
+            if (item.ContainsKey("ChannelName"))
+              return item["ChannelName"].S;
+
+            return null;
         }
     }
 }
