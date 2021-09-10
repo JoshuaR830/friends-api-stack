@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -60,15 +59,8 @@ namespace BotuaGetFriendTimes
             
             var duration = "day";
 
-            // var startTimeUnix = TimeHelper.ConvertDateStringToUnix(startTime);
-            // var endTimeUnix = TimeHelper.ConvertDateStringToUnix(endTime);
-
-            // ToDo: get the data from the DB between startTimeUnix and endTimeUnix
-            
             var dateData = TimeHelper.ConvertToDateStringRange(startTime, endTime);
             
-            // ToDo: Sort the date into daily chunks that can be used (between start and end times)
-
             var barDateLabels = new List<string>();
             
             foreach (var dateInstance in dateData)
@@ -155,10 +147,6 @@ namespace BotuaGetFriendTimes
                 // This is the number of days to calculate
                 var difference = lastTime - firstTime;
 
-                // Todo - loop through everything in those time ranges
-                // ToDo - need to know the differences between them
-                // ToDo: Need to be able to collate the time and convert to hours
-
                 var userTimes = new List<double>(); 
                 
                 foreach (var dataPoint in dateData)
@@ -237,7 +225,6 @@ namespace BotuaGetFriendTimes
             
             var serialisedData = JsonSerializer.Serialize(charts);
             
-            // ToDo - Work out the most time
             // ToDo - work out the streak
             // ToDo - work out the average
             
@@ -251,6 +238,8 @@ namespace BotuaGetFriendTimes
 
         private IEnumerable<TimeItem> FilterItems(List<TimeItem> rawTimeScan)
         {
+            // ToDo: Could be cool to have a filter class with all possible filters as bool - then allow them to be toggled at command level
+            // ToDo: Then when entering a command with Little baby Botua, you could say include AFK, Exclude AFK, Include Muted, Exclude Muted... everything
             return rawTimeScan.Where(x => !x.IsAfk && !x.IsDeafened && !x.IsMuted);
         }
 
@@ -262,6 +251,7 @@ namespace BotuaGetFriendTimes
             })).Parameter.Value);
         }
 
+        // ToDo - refactor into a name helper dependency and inject
         private string GetNameById(long id)
         {
             if (id == _jordanDiscordId)
