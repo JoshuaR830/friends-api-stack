@@ -17,7 +17,7 @@ namespace BotuaFriendTime
             _dynamo = dynamo;
         }
 
-        public async Task PutNewFriendTimeData(string sessionGuid, long userId, long timestamp, long serverId, long channelId)
+        public async Task PutNewFriendTimeData(string sessionGuid, long userId, long timestamp, long serverId, long channelId, string channelName, bool isStreaming, bool isVideoOn, bool isMuted, bool isDeafened, bool isAfk)
         {
             var putTimeRequest = new PutItemRequest
             {
@@ -29,6 +29,12 @@ namespace BotuaFriendTime
                     {"ServerId", new AttributeValue{N = serverId.ToString()}},
                     {"ChannelId", new AttributeValue{N = channelId.ToString()}},
                     {"StartTimestamp", new AttributeValue{N = timestamp.ToString()}},
+                    {"ChanelName", new AttributeValue{S = channelName}},
+                    {"IsStreaming", new AttributeValue{S = isStreaming.ToString()}},
+                    {"IsVideoOn", new AttributeValue{S = isVideoOn.ToString()}},
+                    {"IsMuted", new AttributeValue{S = isMuted.ToString()}},
+                    {"IsDeafened", new AttributeValue{S = isDeafened.ToString()}},
+                    {"IsAfk", new AttributeValue{S = isAfk.ToString()}}
                 }
             };
 
