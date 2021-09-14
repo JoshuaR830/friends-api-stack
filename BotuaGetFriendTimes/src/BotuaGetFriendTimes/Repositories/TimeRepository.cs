@@ -33,7 +33,7 @@ namespace BotuaGetFriendTimes.Repositories
                     {
                         {":startTimestamp", new AttributeValue {N = startTime.ToString()}},
                         {":endTimestamp", new AttributeValue {N = endTime.ToString()}},
-                        // ToDo: at some point pu the channel id in here - need to get it from a secure place though
+                        // ToDo: at some point put the channel id in here - need to get it from a secure place though
                     },
                 };
 
@@ -58,7 +58,12 @@ namespace BotuaGetFriendTimes.Repositories
                     var serverId = item["ServerId"].N;
                     var userId = item["UserId"].N;
 
+
+                    Console.WriteLine("About to get channel name");
+                    
                     var channelName = GetStringValue(item, "ChannelName") ?? "";
+                    Console.WriteLine($"Channel name is {channelName}");
+                    
                     var isAfk = TryConvertToBool(GetStringValue(item, "IsAfk"), false);
                     var isMuted = TryConvertToBool(GetStringValue(item, "IsMuted"), false);
                     var isDeafened = TryConvertToBool(GetStringValue(item, "IsDeafened"), false);
@@ -74,14 +79,19 @@ namespace BotuaGetFriendTimes.Repositories
 
         private bool TryConvertToBool(string @string, bool @bool)
         {
+            Console.WriteLine($"Ths will be converted to bool {@string}");
             return @string != null ? bool.Parse(@string) : @bool;
         }
 
         private string GetStringValue(Dictionary<string, AttributeValue> item, string key)
         {
             if (item.ContainsKey("ChannelName"))
-              return item["ChannelName"].S;
+            {
+                Console.WriteLine("Contains key");
+                return item["ChannelName"].S;
+            }
 
+            Console.WriteLine("Does not contain key");
             return null;
         }
     }
