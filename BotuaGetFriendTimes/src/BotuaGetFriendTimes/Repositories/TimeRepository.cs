@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
@@ -79,16 +80,24 @@ namespace BotuaGetFriendTimes.Repositories
 
         private bool TryConvertToBool(string @string, bool @bool)
         {
-            Console.WriteLine($"Ths will be converted to bool {@string}");
-            return @string != null ? bool.Parse(@string) : @bool;
+            try
+            {
+                Console.WriteLine($"Ths will be converted to bool {@string}");
+                return @string != null ? bool.Parse(@string) : @bool;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Not a bool");
+                return @bool;
+            }
         }
 
         private string GetStringValue(Dictionary<string, AttributeValue> item, string key)
         {
-            if (item.ContainsKey("ChannelName"))
+            if (item.ContainsKey(key))
             {
                 Console.WriteLine("Contains key");
-                return item["ChannelName"].S;
+                return item[key].S;
             }
 
             Console.WriteLine("Does not contain key");
