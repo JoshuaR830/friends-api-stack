@@ -188,7 +188,7 @@ namespace BotuaGetFriendTimes
                     {_lucasDiscordId, "rgba(158, 14, 14, 0.5)"},
                     {_callanDiscordId, "rgba(255, 111, 0, 0.5)"},
                     {_andrewDiscordId, "rgba(158, 132, 14, 0.5)"},
-                    {_martinDiscordId, "rgba(201, 16, 118, 0.5)"}
+                    {_martinDiscordId, "rgba(235, 126, 49, 0.5)"}
                 };
 
                 barDataset.Add(new BarDataset(GetNameById(userId), userTimes, colors[userId]));
