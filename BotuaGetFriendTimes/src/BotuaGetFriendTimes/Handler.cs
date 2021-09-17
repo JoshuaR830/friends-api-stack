@@ -180,7 +180,7 @@ namespace BotuaGetFriendTimes
                 
                 var colors = new Dictionary<long, string>
                 {
-                    {_jordanDiscordId, "rgba(143, 164, 199, 0.5)"},
+                    {_jordanDiscordId, "rgba(61, 129, 255, 0.5)"},
                     {_joshuaDiscordId, "rgba(149, 0, 255, 0.5)"},
                     {_dayleDiscordId, "rgba(21, 128, 11, 0.5)"},
                     {_madalynDiscordId, "rgba(238, 255, 0, 0.5)"},
