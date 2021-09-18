@@ -15,35 +15,17 @@ namespace BotuaGetFriendTimes
     public class Handler
     {
         private readonly ITimeRepository _timeRepository;
-        private readonly IAmazonSimpleSystemsManagement _ssm;
-        private long _jordanDiscordId;
-        private long _joshuaDiscordId;
-        private long _dayleDiscordId;
-        private long _madalynDiscordId;
-        private long _jonnyDiscordId;
-        private long _lucasDiscordId;
-        private long _callanDiscordId;
-        private long _andrewDiscordId;
-        private long _martinDiscordId;
+        private readonly INameHelper _nameHelper;
 
-        public Handler(ITimeRepository timeRepository, IAmazonSimpleSystemsManagement ssm)
+        public Handler(ITimeRepository timeRepository, INameHelper nameHelper)
         {
             _timeRepository = timeRepository;
-            _ssm = ssm;
+            // _ssm = ssm;
+            _nameHelper = nameHelper;
         }
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
-            _jordanDiscordId = await GetSSMValue("JordanId");
-            _joshuaDiscordId = await GetSSMValue("JoshuaId");
-            _dayleDiscordId = await GetSSMValue("DayleId");
-            _madalynDiscordId = await GetSSMValue("DeclynId");
-            _jonnyDiscordId = await GetSSMValue("JonnyId");
-            _lucasDiscordId = await GetSSMValue("LucasId");
-            _callanDiscordId = await GetSSMValue("CallanId");
-            _andrewDiscordId = await GetSSMValue("AndrewId");
-            _martinDiscordId = await GetSSMValue("MartinId");
-            
             var days = int.Parse(input.QueryStringParameters["days"]);
             days--;
 
@@ -71,10 +53,138 @@ namespace BotuaGetFriendTimes
 
             var rawTimeScan = (await _timeRepository.GetTimeByTimeRange(startTime, endTime)).ToList();
 
-            var timeScan = FilterItems(rawTimeScan);
+            // ToDo - problem - can be muted and streaming - how do you decide what to show - needs to be separate graphs
+            // ToDo - keep the graphs separate
+            var sortedData = new DataBuilder()
+                .WithIsActiveItems(rawTimeScan.Where(x => !x.IsAfk && !x.IsDeafened && !x.IsMuted))
+                .WithIsMutedItems(rawTimeScan.Where(x => x.IsMuted))
+                .WithIsDeafenedItems(rawTimeScan.Where(x => x.IsDeafened))
+                .WithIsAfkItems(rawTimeScan.Where(x => x.IsAfk))
+                .WithIsStreamingItems(rawTimeScan.Where(x => x.IsStreaming))
+                .WithIsVideoOnItems(rawTimeScan.Where(x => x.IsVideoOn))
+                .Build();
 
-            var orderedTimes = timeScan.OrderBy(x => x.StartTimestamp).ToList();
+            var selectedStat = "isActive";
+            var timeScan = DataForSelectedStat(selectedStat, sortedData);
+            
+            var tuple = DoTheThing(timeScan);
+            var userStartTimeList = tuple.Item1;
+            var userEndTimeList = tuple.Item2;
 
+            var userIds = GetUniqueUserIds(timeScan);
+
+            Console.WriteLine($"There are {userIds.Count} user Id's");
+            var barDataset = new List<BarDataset>();
+            var preliminaryPieData = new List<BarDataset>();
+
+            foreach (var userId in userIds)
+            {
+                var specificUserStartList = userStartTimeList[userId];
+                var specificUserEndList = userEndTimeList[userId];
+
+                var firstTime = specificUserStartList[0];
+                var lastTime = specificUserEndList[^1];
+
+                // This is the number of days to calculate
+                var difference = lastTime - firstTime;
+
+                var userTimes = new List<double>(); 
+                
+                foreach (var dataPoint in dateData)
+                {
+                    var specificStartDay = dataPoint.StartOfDay;
+                    var specificEndDay = dataPoint.EndOfDay;
+                    
+                    // Get today's start and end times
+                    var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
+                    var endTimesForToday = specificUserEndList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
+
+                    Console.WriteLine($"Start: {startTimesForToday.Count}, End: {endTimesForToday.Count} Equal: {startTimesForToday.Count == endTimesForToday.Count}");
+
+                    if (startTimesForToday.Count == endTimesForToday.Count)
+                    {
+                        var hoursOnline = 0d;
+                        
+                        for (int i = 0; i < startTimesForToday.Count; i++)
+                        {
+                            // Work out how many hours for each session
+                            var sessionTimeMillis = endTimesForToday[i] - startTimesForToday[i];
+                            
+                            // Add up the hours online for if multiple sessions in a day
+                            hoursOnline += TimeHelper.ConvertToHours(sessionTimeMillis);
+                        }
+                        
+                        Console.WriteLine($"Hours online {hoursOnline} stored");
+                        userTimes.Add(hoursOnline);
+                    }
+                }
+
+                barDataset.Add(new BarDataset(_nameHelper.GetNameById(userId), userTimes, _nameHelper.GetColourById(userId)));
+
+                barDataset = barDataset.OrderBy(x => x.Label).ToList();
+
+                preliminaryPieData.Add(new BarDataset(_nameHelper.GetNameById(userId), new List<double> {Math.Round(userTimes.Sum(), 2, MidpointRounding.AwayFromZero)}, _nameHelper.GetColourById(userId)));
+                preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
+            }
+
+            var barData = new BarData(barDateLabels, barDataset);
+
+            var pieDataLabels = preliminaryPieData.Select(x => x.Label).ToList();
+
+            var pieDataPoints = new List<double>();
+            var pieColors = new List<string>();
+            
+            preliminaryPieData.ForEach(x =>
+            {
+                pieDataPoints.Add(x.Data[0]);
+                pieColors.Add(x.BackgroundColor);
+            });
+            
+            var pieDataset = new PieDataset(pieDataPoints, pieColors);
+            
+            var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
+            var barGraph = new BarGraph(barData);
+
+
+            var orderedPieData = preliminaryPieData.OrderByDescending(x => x.Data[0]).ToList();
+            var champion = new Champion(orderedPieData[0].Label, orderedPieData[0].BackgroundColor, orderedPieData[0].Data[0]);
+            var charts = new Response(barGraph, pieChart, champion);
+            
+            var serialisedData = JsonSerializer.Serialize(charts);
+            
+            // ToDo - work out the streak
+            // ToDo - work out the average
+            
+            return new APIGatewayProxyResponse
+            {
+                StatusCode = 200,
+                Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
+                Body = serialisedData
+            };
+        }
+
+        private IEnumerable<TimeItem> DataForSelectedStat(string selectedStat, SortedDataObject sortedData)
+        {
+            return selectedStat switch
+            {
+                "isMuted" => sortedData.IsMutedItems,
+                "isDeafened" => sortedData.IsDeafenedItems,
+                "isAfk" => sortedData.IsAfkItems,
+                "isStreaming" => sortedData.IsStreamingItems,
+                "isVideoOn" => sortedData.IsVideoOnItems,
+                "isActive" => sortedData.ActiveTimeItems,
+                _ => sortedData.ActiveTimeItems
+            };
+        }
+
+        private List<long> GetUniqueUserIds(IEnumerable<TimeItem> timeItems)
+        {
+            return timeItems.Select(x => x.UserId).Distinct().ToList();
+        }
+
+        private (Dictionary<long, List<long>>, Dictionary<long, List<long>>) DoTheThing(IEnumerable<TimeItem> timeScan)
+        {
             var userStartTimeList = new Dictionary<long, List<long>>();
             var userEndTimeList = new Dictionary<long, List<long>>();
             
@@ -130,158 +240,8 @@ namespace BotuaGetFriendTimes
                 }
             }
 
-            var userIds = timeScan.Select(x => x.UserId).Distinct().ToList();
-
-            Console.WriteLine($"There are {userIds.Count} user Id's");
-            var barDataset = new List<BarDataset>();
-            var preliminaryPieData = new List<BarDataset>();
-
-            foreach (var userId in userIds)
-            {
-                var specificUserStartList = userStartTimeList[userId];
-                var specificUserEndList = userEndTimeList[userId];
-
-                var firstTime = specificUserStartList[0];
-                var lastTime = specificUserEndList[^1];
-
-                // This is the number of days to calculate
-                var difference = lastTime - firstTime;
-
-                var userTimes = new List<double>(); 
-                
-                foreach (var dataPoint in dateData)
-                {
-                    var specificStartDay = dataPoint.StartOfDay;
-                    var specificEndDay = dataPoint.EndOfDay;
-                    
-                    // Get today's start and end times
-                    var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
-                    var endTimesForToday = specificUserEndList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
-
-                    Console.WriteLine($"Start: {startTimesForToday.Count}, End: {endTimesForToday.Count} Equal: {startTimesForToday.Count == endTimesForToday.Count}");
-
-                    if (startTimesForToday.Count == endTimesForToday.Count)
-                    {
-                        var hoursOnline = 0d;
-                        
-                        for (int i = 0; i < startTimesForToday.Count; i++)
-                        {
-                            // Work out how many hours for each session
-                            var sessionTimeMillis = endTimesForToday[i] - startTimesForToday[i];
-                            
-                            // Add up the hours online for if multiple sessions in a day
-                            hoursOnline += TimeHelper.ConvertToHours(sessionTimeMillis);
-                        }
-                        
-                        Console.WriteLine($"Hours online {hoursOnline} stored");
-                        userTimes.Add(hoursOnline);
-                    }
-                }
-                
-                var colors = new Dictionary<long, string>
-                {
-                    {_jordanDiscordId, "rgba(61, 129, 255, 0.5)"},
-                    {_joshuaDiscordId, "rgba(149, 0, 255, 0.5)"},
-                    {_dayleDiscordId, "rgba(21, 128, 11, 0.5)"},
-                    {_madalynDiscordId, "rgba(238, 255, 0, 0.5)"},
-                    {_jonnyDiscordId, "rgba(252, 3, 202, 0.5)"},
-                    {_lucasDiscordId, "rgba(158, 14, 14, 0.5)"},
-                    {_callanDiscordId, "rgba(255, 111, 0, 0.5)"},
-                    {_andrewDiscordId, "rgba(158, 132, 14, 0.5)"},
-                    {_martinDiscordId, "rgba(235, 126, 49, 0.5)"}
-                };
-
-                barDataset.Add(new BarDataset(GetNameById(userId), userTimes, colors[userId]));
-
-                barDataset = barDataset.OrderBy(x => x.Label).ToList();
-
-                preliminaryPieData.Add(new BarDataset(GetNameById(userId), new List<double> {Math.Round(userTimes.Sum(), 2, MidpointRounding.AwayFromZero)}, colors[userId]));
-                preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
-            }
-
-            var barData = new BarData(barDateLabels, barDataset);
-
-            var pieDataLabels = preliminaryPieData.Select(x => x.Label).ToList();
-
-            var pieDataPoints = new List<double>();
-            var pieColors = new List<string>();
-            
-            preliminaryPieData.ForEach(x =>
-            {
-                pieDataPoints.Add(x.Data[0]);
-                pieColors.Add(x.BackgroundColor);
-            });
-            
-            var pieDataset = new PieDataset(pieDataPoints, pieColors);
-            
-            var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
-            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
-            var barGraph = new BarGraph(barData);
-
-
-            var orderedPieData = preliminaryPieData.OrderByDescending(x => x.Data[0]).ToList();
-            var champion = new Champion(orderedPieData[0].Label, orderedPieData[0].BackgroundColor, orderedPieData[0].Data[0]);
-            var charts = new Response(barGraph, pieChart, champion);
-            
-            var serialisedData = JsonSerializer.Serialize(charts);
-            
-            // ToDo - work out the streak
-            // ToDo - work out the average
-            
-            return new APIGatewayProxyResponse
-            {
-                StatusCode = 200,
-                Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
-                Body = serialisedData
-            };
-        }
-
-        private IEnumerable<TimeItem> FilterItems(List<TimeItem> rawTimeScan)
-        {
-            // ToDo: Could be cool to have a filter class with all possible filters as bool - then allow them to be toggled at command level
-            // ToDo: Then when entering a command with Little baby Botua, you could say include AFK, Exclude AFK, Include Muted, Exclude Muted... everything
-            return rawTimeScan.Where(x => !x.IsAfk && !x.IsDeafened && !x.IsMuted);
-        }
-
-        private async Task<long> GetSSMValue(string parameterName)
-        {
-            return Convert.ToInt64((await _ssm.GetParameterAsync(new GetParameterRequest
-            {
-                Name = parameterName
-            })).Parameter.Value);
-        }
-
-        // ToDo - refactor into a name helper dependency and inject
-        private string GetNameById(long id)
-        {
-            if (id == _jordanDiscordId)
-                return "Jordan";
-            
-            if (id == _joshuaDiscordId)
-                return "Joshua";
-            
-            if (id == _dayleDiscordId)
-                return "Dayle";
-            
-            if (id == _madalynDiscordId)
-                return "Maddie";
-            
-            if (id == _jonnyDiscordId)
-                return "Jonny";
-            
-            if (id == _lucasDiscordId)
-                return "Lucas";
-            
-            if (id == _callanDiscordId)
-                return "Callan";
-            
-            if (id == _andrewDiscordId)
-                return "Andrew";
-            
-            if (id == _martinDiscordId)
-                return "Martin";
-
-            return "Other";
+            return (userStartTimeList, userEndTimeList);
         }
     }
+    
 }

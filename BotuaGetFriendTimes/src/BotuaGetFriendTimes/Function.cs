@@ -7,6 +7,7 @@ using Amazon.Extensions.NETCore.Setup;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.SimpleSystemsManagement;
+using BotuaGetFriendTimes.Models;
 using BotuaGetFriendTimes.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,6 +34,7 @@ namespace BotuaGetFriendTimes
             _serviceCollection.AddAWSService<IAmazonSimpleSystemsManagement>();
             _serviceCollection.AddTransient<Handler>();
             _serviceCollection.AddTransient<ITimeRepository, TimeRepository>();
+            _serviceCollection.AddTransient<INameHelper, NameHelper>();
         }
         
         /// <summary>
