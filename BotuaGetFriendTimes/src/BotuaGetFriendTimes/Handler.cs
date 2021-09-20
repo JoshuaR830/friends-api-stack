@@ -92,32 +92,64 @@ namespace BotuaGetFriendTimes
             var videoDataTuple = ProcessGraphData(GetUniqueUserIds(isVideoOnTimeScan), videoTimesTuple.Item1, videoTimesTuple.Item2, dateData);
             var activeDataTuple = ProcessGraphData(GetUniqueUserIds(isActiveTimeScan), activeTimesTuple.Item1, activeTimesTuple.Item2, dateData);
 
-            var barData = new BarData(barDateLabels, activeDataTuple.Item1);
+            var mutedChampion = new Champion("", "", 0);
+            var deafenedChampion = new Champion("", "", 0);
+            var afkChampion = new Champion("", "", 0);
+            var streamingChampion = new Champion("", "", 0);
+            var videoChampion = new Champion("", "", 0);
+            var activeChampion = new Champion("", "", 0);
+            
+            
+            if (mutedDataTuple.Item2.Any())
+            {
+                var orderedMutedPieData = mutedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                mutedChampion = new Champion(orderedMutedPieData[0].Label, orderedMutedPieData[0].BackgroundColor, orderedMutedPieData[0].Data[0]);
+            }
 
-            var pieData = GeneratePieData(activeDataTuple.Item2);
-            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
-            var barGraph = new BarGraph(barData);
-
-
-            var orderedMutedPieData = mutedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-            var orderedDeafenedPieData = deafenedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-            var orderedAfkPieData = afkDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-            var orderedStreamingPieData = streamingDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-            var orderedVideoPieData = videoDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-            var orderedActivePieData = activeDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+            if (deafenedDataTuple.Item2.Any())
+            {
+                
+                var orderedDeafenedPieData = deafenedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                deafenedChampion = new Champion(orderedDeafenedPieData[0].Label, orderedDeafenedPieData[0].BackgroundColor, orderedDeafenedPieData[0].Data[0]);
+            }
+            
+            if (afkDataTuple.Item2.Any())
+            {
+                var orderedAfkPieData = afkDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                afkChampion = new Champion(orderedAfkPieData[0].Label, orderedAfkPieData[0].BackgroundColor, orderedAfkPieData[0].Data[0]);
+            }
+            
+            if (streamingDataTuple.Item2.Any())
+            {
+                var orderedStreamingPieData = streamingDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                streamingChampion = new Champion(orderedStreamingPieData[0].Label, orderedStreamingPieData[0].BackgroundColor, orderedStreamingPieData[0].Data[0]);
+            }
+            
+            if (videoDataTuple.Item2.Any())
+            {
+                var orderedVideoPieData = videoDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                videoChampion = new Champion(orderedVideoPieData[0].Label, orderedVideoPieData[0].BackgroundColor, orderedVideoPieData[0].Data[0]);
+            }
+            
+            if (activeDataTuple.Item2.Any())
+            {
+                var orderedActivePieData = activeDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                activeChampion = new Champion(orderedActivePieData[0].Label, orderedActivePieData[0].BackgroundColor, orderedActivePieData[0].Data[0]);
+            }
 
             // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
             // ToDo - calculate the total time in millis
             // ToDo - see who has the largest number of millis
             // ToDo - convert total time to hours
             // ToDo - put the data into a champion
-            var activeChampion = new Champion(orderedActivePieData[0].Label, orderedActivePieData[0].BackgroundColor, orderedActivePieData[0].Data[0]);
-            var mutedChampion = new Champion(orderedMutedPieData[0].Label, orderedMutedPieData[0].BackgroundColor, orderedMutedPieData[0].Data[0]);
-            var deafenedChampion = new Champion(orderedDeafenedPieData[0].Label, orderedDeafenedPieData[0].BackgroundColor, orderedDeafenedPieData[0].Data[0]);
-            var afkChampion = new Champion(orderedAfkPieData[0].Label, orderedAfkPieData[0].BackgroundColor, orderedAfkPieData[0].Data[0]);
-            var streamingChampion = new Champion(orderedStreamingPieData[0].Label, orderedStreamingPieData[0].BackgroundColor, orderedStreamingPieData[0].Data[0]);
-            var videoChampion = new Champion(orderedVideoPieData[0].Label, orderedVideoPieData[0].BackgroundColor, orderedVideoPieData[0].Data[0]);
 
+
+            var barData = new BarData(barDateLabels, activeDataTuple.Item1);
+
+            var pieData = GeneratePieData(activeDataTuple.Item2);
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
+            var barGraph = new BarGraph(barData);
+            
             var champions = new Champions(activeChampion, mutedChampion, deafenedChampion, afkChampion, streamingChampion, videoChampion);
             
             var charts = new Response(barGraph, pieChart, champions, activeChampion);
