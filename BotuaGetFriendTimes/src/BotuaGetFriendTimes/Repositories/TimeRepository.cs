@@ -82,12 +82,10 @@ namespace BotuaGetFriendTimes.Repositories
         {
             try
             {
-                Console.WriteLine($"Ths will be converted to bool {@string}");
                 return @string != null ? bool.Parse(@string) : @bool;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Not a bool");
                 return @bool;
             }
         }
@@ -96,11 +94,9 @@ namespace BotuaGetFriendTimes.Repositories
         {
             if (item.ContainsKey(key))
             {
-                Console.WriteLine("Contains key");
                 return item[key].S;
             }
 
-            Console.WriteLine("Does not contain key");
             return null;
         }
     }

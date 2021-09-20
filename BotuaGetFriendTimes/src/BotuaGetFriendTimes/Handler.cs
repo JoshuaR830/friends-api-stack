@@ -158,8 +158,11 @@ namespace BotuaGetFriendTimes
             var barDataset = new List<BarDataset>();
             var preliminaryPieData = new List<BarDataset>();
 
+            Console.WriteLine($"Log user ID count: {userIds.Count}");
+            
             foreach (var userId in userIds)
             {
+                Console.WriteLine(userId);
                 var specificUserStartList = userStartTimeList[userId];
                 var specificUserEndList = userEndTimeList[userId];
 
@@ -237,8 +240,6 @@ namespace BotuaGetFriendTimes
             
             foreach (var item in timeScan)
             {
-                Console.WriteLine(item.SessionId);
-
                 var sessionStarts = new List<long>();
                 var sessionEnds = new List<long>();
 
