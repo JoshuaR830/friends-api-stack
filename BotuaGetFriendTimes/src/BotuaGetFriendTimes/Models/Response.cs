@@ -13,11 +13,15 @@ namespace BotuaGetFriendTimes.Models
         
         [JsonPropertyName("champion")]
         public Champion Champion { get; set; }
+        
+        [JsonPropertyName("champions")]
+        public Champions Champions { get; set; }
      
-        public Response(BarGraph barBarData, PieChart pieBarData, Champion champion)
+        public Response(BarGraph barBarData, PieChart pieBarData, Champions champions, Champion champion)
         {
             BarBarGraph = barBarData;
             PieBarChart = pieBarData;
+            Champions = champions;
             Champion = champion;
         }
     }

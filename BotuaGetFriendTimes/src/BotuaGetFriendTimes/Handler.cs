@@ -65,15 +65,96 @@ namespace BotuaGetFriendTimes
                 .Build();
 
             var selectedStat = "isActive";
-            var timeScan = DataForSelectedStat(selectedStat, sortedData);
+            var isMutedTimeScan = DataForSelectedStat("isMuted", sortedData);
+            var isDeafenedTimeScan = DataForSelectedStat("isDeafened", sortedData);
+            var isAfkTimeScan = DataForSelectedStat("isAfk", sortedData);
+            var isStreamingTimeScan = DataForSelectedStat("isStreaming", sortedData);
+            var isVideoOnTimeScan = DataForSelectedStat("isVideoOn", sortedData);
+            var isActiveTimeScan = DataForSelectedStat("isActive", sortedData);
             
-            var tuple = DoTheThing(timeScan);
-            var userStartTimeList = tuple.Item1;
-            var userEndTimeList = tuple.Item2;
+            var mutedTimesTuple = GetTimesForData(isMutedTimeScan);
+            var deafenedTimesTuple = GetTimesForData(isDeafenedTimeScan);
+            var afkTimesTuple = GetTimesForData(isAfkTimeScan);
+            var streamingTimesTuple = GetTimesForData(isStreamingTimeScan);
+            var videoTimesTuple = GetTimesForData(isVideoOnTimeScan);
+            var activeTimesTuple = GetTimesForData(isActiveTimeScan);
+            // var userStartTimeList = tuple.Item1;
+            // var userEndTimeList = tuple.Item2;
 
-            var userIds = GetUniqueUserIds(timeScan);
+            var userIds = GetUniqueUserIds(isActiveTimeScan);
 
             Console.WriteLine($"There are {userIds.Count} user Id's");
+
+            var mutedDataTuple = ProcessGraphData(userIds, mutedTimesTuple.Item1, mutedTimesTuple.Item2, dateData);
+            var deafenedDataTuple = ProcessGraphData(userIds, deafenedTimesTuple.Item1, deafenedTimesTuple.Item2, dateData);
+            var afkDataTuple = ProcessGraphData(userIds, afkTimesTuple.Item1, afkTimesTuple.Item2, dateData);
+            var streamingDataTuple = ProcessGraphData(userIds, streamingTimesTuple.Item1, streamingTimesTuple.Item2, dateData);
+            var videoDataTuple = ProcessGraphData(userIds, videoTimesTuple.Item1, videoTimesTuple.Item2, dateData);
+            var activeDataTuple = ProcessGraphData(userIds, activeTimesTuple.Item1, activeTimesTuple.Item2, dateData);
+
+            var barData = new BarData(barDateLabels, activeDataTuple.Item1);
+
+            var pieData = GeneratePieData(activeDataTuple.Item2);
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
+            var barGraph = new BarGraph(barData);
+
+
+            var orderedMutedPieData = mutedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+            var orderedDeafenedPieData = deafenedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+            var orderedAfkPieData = afkDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+            var orderedStreamingPieData = streamingDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+            var orderedVideoPieData = videoDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+            var orderedActivePieData = activeDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+
+            // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
+            // ToDo - calculate the total time in millis
+            // ToDo - see who has the largest number of millis
+            // ToDo - convert total time to hours
+            // ToDo - put the data into a champion
+            var activeChampion = new Champion(orderedActivePieData[0].Label, orderedActivePieData[0].BackgroundColor, orderedActivePieData[0].Data[0]);
+            var mutedChampion = new Champion(orderedMutedPieData[0].Label, orderedMutedPieData[0].BackgroundColor, orderedMutedPieData[0].Data[0]);
+            var deafenedChampion = new Champion(orderedDeafenedPieData[0].Label, orderedDeafenedPieData[0].BackgroundColor, orderedDeafenedPieData[0].Data[0]);
+            var afkChampion = new Champion(orderedAfkPieData[0].Label, orderedAfkPieData[0].BackgroundColor, orderedAfkPieData[0].Data[0]);
+            var streamingChampion = new Champion(orderedStreamingPieData[0].Label, orderedStreamingPieData[0].BackgroundColor, orderedStreamingPieData[0].Data[0]);
+            var videoChampion = new Champion(orderedVideoPieData[0].Label, orderedVideoPieData[0].BackgroundColor, orderedVideoPieData[0].Data[0]);
+
+            var champions = new Champions(activeChampion, mutedChampion, deafenedChampion, afkChampion, streamingChampion, videoChampion);
+            
+            var charts = new Response(barGraph, pieChart, champions, activeChampion);
+            
+            var serialisedData = JsonSerializer.Serialize(charts);
+            
+            // ToDo - work out the streak
+            // ToDo - work out the average
+            
+            return new APIGatewayProxyResponse
+            {
+                StatusCode = 200,
+                Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
+                Body = serialisedData
+            };
+        }
+
+        public PieData GeneratePieData(List<BarDataset> preliminaryPieData)
+        {
+            var pieDataLabels = preliminaryPieData.Select(x => x.Label).ToList();
+
+            var pieDataPoints = new List<double>();
+            var pieColors = new List<string>();
+            
+            preliminaryPieData.ForEach(x =>
+            {
+                pieDataPoints.Add(x.Data[0]);
+                pieColors.Add(x.BackgroundColor);
+            });
+            
+            var pieDataset = new PieDataset(pieDataPoints, pieColors);
+            
+            return new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
+        }
+
+        private (List<BarDataset>, List<BarDataset>) ProcessGraphData(List<long> userIds, Dictionary<long, List<long>> userStartTimeList, Dictionary<long, List<long>> userEndTimeList, List<DateData> dateData)
+        {
             var barDataset = new List<BarDataset>();
             var preliminaryPieData = new List<BarDataset>();
 
@@ -127,41 +208,7 @@ namespace BotuaGetFriendTimes
                 preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
             }
 
-            var barData = new BarData(barDateLabels, barDataset);
-
-            var pieDataLabels = preliminaryPieData.Select(x => x.Label).ToList();
-
-            var pieDataPoints = new List<double>();
-            var pieColors = new List<string>();
-            
-            preliminaryPieData.ForEach(x =>
-            {
-                pieDataPoints.Add(x.Data[0]);
-                pieColors.Add(x.BackgroundColor);
-            });
-            
-            var pieDataset = new PieDataset(pieDataPoints, pieColors);
-            
-            var pieData = new PieData(pieDataLabels, new List<PieDataset> {pieDataset});
-            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
-            var barGraph = new BarGraph(barData);
-
-
-            var orderedPieData = preliminaryPieData.OrderByDescending(x => x.Data[0]).ToList();
-            var champion = new Champion(orderedPieData[0].Label, orderedPieData[0].BackgroundColor, orderedPieData[0].Data[0]);
-            var charts = new Response(barGraph, pieChart, champion);
-            
-            var serialisedData = JsonSerializer.Serialize(charts);
-            
-            // ToDo - work out the streak
-            // ToDo - work out the average
-            
-            return new APIGatewayProxyResponse
-            {
-                StatusCode = 200,
-                Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
-                Body = serialisedData
-            };
+            return (barDataset, preliminaryPieData);
         }
 
         private IEnumerable<TimeItem> DataForSelectedStat(string selectedStat, SortedDataObject sortedData)
@@ -183,7 +230,7 @@ namespace BotuaGetFriendTimes
             return timeItems.Select(x => x.UserId).Distinct().ToList();
         }
 
-        private (Dictionary<long, List<long>>, Dictionary<long, List<long>>) DoTheThing(IEnumerable<TimeItem> timeScan)
+        private (Dictionary<long, List<long>>, Dictionary<long, List<long>>) GetTimesForData(IEnumerable<TimeItem> timeScan)
         {
             var userStartTimeList = new Dictionary<long, List<long>>();
             var userEndTimeList = new Dictionary<long, List<long>>();
