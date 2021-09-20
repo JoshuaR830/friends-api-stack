@@ -65,12 +65,12 @@ namespace BotuaGetFriendTimes
                 .Build();
 
             var selectedStat = "isActive";
-            var isMutedTimeScan = DataForSelectedStat("isMuted", sortedData);
-            var isDeafenedTimeScan = DataForSelectedStat("isDeafened", sortedData);
-            var isAfkTimeScan = DataForSelectedStat("isAfk", sortedData);
-            var isStreamingTimeScan = DataForSelectedStat("isStreaming", sortedData);
-            var isVideoOnTimeScan = DataForSelectedStat("isVideoOn", sortedData);
-            var isActiveTimeScan = DataForSelectedStat("isActive", sortedData);
+            var isMutedTimeScan = DataForSelectedStat("isMuted", sortedData).ToList();
+            var isDeafenedTimeScan = DataForSelectedStat("isDeafened", sortedData).ToList();
+            var isAfkTimeScan = DataForSelectedStat("isAfk", sortedData).ToList();
+            var isStreamingTimeScan = DataForSelectedStat("isStreaming", sortedData).ToList();
+            var isVideoOnTimeScan = DataForSelectedStat("isVideoOn", sortedData).ToList();
+            var isActiveTimeScan = DataForSelectedStat("isActive", sortedData).ToList();
             
             var mutedTimesTuple = GetTimesForData(isMutedTimeScan);
             var deafenedTimesTuple = GetTimesForData(isDeafenedTimeScan);
@@ -85,12 +85,12 @@ namespace BotuaGetFriendTimes
 
             Console.WriteLine($"There are {userIds.Count} user Id's");
 
-            var mutedDataTuple = ProcessGraphData(userIds, mutedTimesTuple.Item1, mutedTimesTuple.Item2, dateData);
-            var deafenedDataTuple = ProcessGraphData(userIds, deafenedTimesTuple.Item1, deafenedTimesTuple.Item2, dateData);
-            var afkDataTuple = ProcessGraphData(userIds, afkTimesTuple.Item1, afkTimesTuple.Item2, dateData);
-            var streamingDataTuple = ProcessGraphData(userIds, streamingTimesTuple.Item1, streamingTimesTuple.Item2, dateData);
-            var videoDataTuple = ProcessGraphData(userIds, videoTimesTuple.Item1, videoTimesTuple.Item2, dateData);
-            var activeDataTuple = ProcessGraphData(userIds, activeTimesTuple.Item1, activeTimesTuple.Item2, dateData);
+            var mutedDataTuple = ProcessGraphData(GetUniqueUserIds(isMutedTimeScan), mutedTimesTuple.Item1, mutedTimesTuple.Item2, dateData);
+            var deafenedDataTuple = ProcessGraphData(GetUniqueUserIds(isDeafenedTimeScan), deafenedTimesTuple.Item1, deafenedTimesTuple.Item2, dateData);
+            var afkDataTuple = ProcessGraphData(GetUniqueUserIds(isAfkTimeScan), afkTimesTuple.Item1, afkTimesTuple.Item2, dateData);
+            var streamingDataTuple = ProcessGraphData(GetUniqueUserIds(isStreamingTimeScan), streamingTimesTuple.Item1, streamingTimesTuple.Item2, dateData);
+            var videoDataTuple = ProcessGraphData(GetUniqueUserIds(isVideoOnTimeScan), videoTimesTuple.Item1, videoTimesTuple.Item2, dateData);
+            var activeDataTuple = ProcessGraphData(GetUniqueUserIds(isActiveTimeScan), activeTimesTuple.Item1, activeTimesTuple.Item2, dateData);
 
             var barData = new BarData(barDateLabels, activeDataTuple.Item1);
 
