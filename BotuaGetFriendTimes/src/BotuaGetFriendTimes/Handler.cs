@@ -57,7 +57,7 @@ namespace BotuaGetFriendTimes
             // ToDo - keep the graphs separate
             var sortedData = new DataBuilder()
                 .WithIsActiveItems(rawTimeScan.Where(x => !x.IsAfk && !x.IsDeafened && !x.IsMuted))
-                .WithIsMutedItems(rawTimeScan.Where(x => x.IsMuted))
+                .WithIsMutedItems(rawTimeScan.Where(x => x.IsMuted && !x.IsDeafened))
                 .WithIsDeafenedItems(rawTimeScan.Where(x => x.IsDeafened))
                 .WithIsAfkItems(rawTimeScan.Where(x => x.IsAfk))
                 .WithIsStreamingItems(rawTimeScan.Where(x => x.IsStreaming))
