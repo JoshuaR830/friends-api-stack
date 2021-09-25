@@ -196,6 +196,9 @@ namespace BotuaGetFriendTimes
             foreach (var item in activeDataTuple.Item1)
             {
                 var tempDays = item.Data.Count(x => x > 0);
+                Console.WriteLine($"{item.Label} data:");
+                foreach(var thing in item.Data)
+                    Console.WriteLine(thing);
                 
                 if (tempDays > bestDays)
                 {
@@ -220,8 +223,8 @@ namespace BotuaGetFriendTimes
             
             championsList.Add(new Champion(selectedName, selectedColor, 0, 
                 $"{selectedName} is the Reckless Reliant Robin Rider",
-                $"The most reliable person in the last {originalDays}, with {bestDays} days active is {selectedName}, well done!",
-                $"{AchievementImageFolderUrl}/reliant-robin"));
+                $"The most reliable person in the last {originalDays} days, with {bestDays} days active is {selectedName}, well done!",
+                $"{AchievementImageFolderUrl}/reliant-robin.png"));
 
             // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
             // ToDo - calculate the total time in millis
