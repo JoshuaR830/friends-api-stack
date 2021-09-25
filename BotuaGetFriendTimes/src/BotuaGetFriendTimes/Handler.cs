@@ -225,8 +225,8 @@ namespace BotuaGetFriendTimes
             }
             
             championsList.Add(new Champion(selectedName, selectedColor, 0, 
-                $"{selectedName} is the Reckless Reliant Robin Rider",
-                $"The most reliable person in the last {originalDays} days, with {bestDays} days active is {selectedName}, well done!",
+                $"{selectedName} is the Reckless Reliant Robin Rider :fire_engine:",
+                $"The most reliable person in the last {originalDays} days, with {bestDays} days in a channel is {selectedName}, well done, you are undoubtedly the most reliable person - for now!",
                 $"{AchievementImageFolderUrl}/reliant-robin-medal.png"));
 
             // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
