@@ -30,6 +30,9 @@ namespace BotuaGetFriendTimes
         {
             var originalDays = int.Parse(input.QueryStringParameters["days"]);
             var days = originalDays--;
+            
+            Console.WriteLine($"Original days {originalDays}");
+            Console.WriteLine($"New days {days}");
 
             var millis = days * TimeHelper.DayLengthMillis;
 
