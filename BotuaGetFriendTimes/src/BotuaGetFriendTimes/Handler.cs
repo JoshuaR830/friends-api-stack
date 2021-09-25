@@ -29,7 +29,7 @@ namespace BotuaGetFriendTimes
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
             var originalDays = int.Parse(input.QueryStringParameters["days"]);
-            var days = originalDays--;
+            var days = originalDays - 1;
             
             Console.WriteLine($"Original days {originalDays}");
             Console.WriteLine($"New days {days}");
