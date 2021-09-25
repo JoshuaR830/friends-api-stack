@@ -114,7 +114,7 @@ namespace BotuaGetFriendTimes
                 var time = orderedActivePieData[0].Data[0];
                 var title = $"{name} is the champion :crown:";
                 var description = $"The most active user for the previous {originalDays} days was {name} with an active time of {time} hours what a champion!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/active-time-champion.png";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/king-medal.png";
                 
                 activeChampion = new Champion(name, orderedActivePieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(activeChampion);
@@ -128,7 +128,7 @@ namespace BotuaGetFriendTimes
 
                 var title = $"{name} is the king of the squid people :squid:";
                 var description = $"{name}, with a deafened time of {time} hours in the previous {originalDays} days you were deafened so long that like the squid, you may as well have no ears!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/deafened.png";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/squid-medal.png";
                 
                 deafenedChampion = new Champion(name, orderedDeafenedPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(deafenedChampion);
@@ -142,7 +142,7 @@ namespace BotuaGetFriendTimes
                 
                 var title = $"{name} is the new captain of the muted mutiny :pirate_flag:";
                 var description = $"With a muted time of {time} hours in the previous {originalDays} days we had no option but to promote {name} to the prestigious position of captain of the muted mutiny!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/muted.png";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/pirate-medal.png";
                 
                 mutedChampion = new Champion(name, orderedMutedPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(mutedChampion);
@@ -156,7 +156,7 @@ namespace BotuaGetFriendTimes
                 
                 var title = $"{name} is the superior shark :shark:";
                 var description = $"With a streaming time of {time} hours in the previous {originalDays} days, like the mighty shark, normal streams could not hold your superiority, so {name} takes the title of Superior Shark - congratulations!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/streaming.png";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/shark-medal.png";
                 
                 streamingChampion = new Champion(name, orderedStreamingPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(streamingChampion);
@@ -170,7 +170,7 @@ namespace BotuaGetFriendTimes
                 
                 var title = $"{name} is the leader of the sleeping sloths :sloth:";
                 var description = $"With {time} days away from keyboard in the last {originalDays} days, there's no question, {name} is the new leader of the sleeping sloths!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/sloth.png";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/sloth-medal.png";
                 
                 afkChampion = new Champion(name, orderedAfkPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(afkChampion);
@@ -184,7 +184,7 @@ namespace BotuaGetFriendTimes
                 
                 var title = $"Viva la {name}, viva la Vlogger :video_camera:";
                 var description = $"Born to be a vlogger, your time on video of {time} hours in the previous {originalDays} days means {name} you are closer than anyone else to being a fully fledged vlogger!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/video.png";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/video-medal.png";
                     
                 videoChampion = new Champion(name, orderedVideoPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(videoChampion);
@@ -227,7 +227,7 @@ namespace BotuaGetFriendTimes
             championsList.Add(new Champion(selectedName, selectedColor, 0, 
                 $"{selectedName} is the Reckless Reliant Robin Rider",
                 $"The most reliable person in the last {originalDays} days, with {bestDays} days active is {selectedName}, well done!",
-                $"{AchievementImageFolderUrl}/reliant-robin.png"));
+                $"{AchievementImageFolderUrl}/reliant-robin-medal.png"));
 
             // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
             // ToDo - calculate the total time in millis
