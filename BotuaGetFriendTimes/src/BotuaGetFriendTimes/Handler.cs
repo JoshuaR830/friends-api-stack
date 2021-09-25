@@ -73,7 +73,7 @@ namespace BotuaGetFriendTimes
             var isStreamingTimeScan = DataForSelectedStat("isStreaming", sortedData).ToList();
             var isVideoOnTimeScan = DataForSelectedStat("isVideoOn", sortedData).ToList();
             var isActiveTimeScan = DataForSelectedStat("isActive", sortedData).ToList();
-            
+
             var mutedTimesTuple = GetTimesForData(isMutedTimeScan);
             var deafenedTimesTuple = GetTimesForData(isDeafenedTimeScan);
             var afkTimesTuple = GetTimesForData(isAfkTimeScan);
@@ -186,6 +186,42 @@ namespace BotuaGetFriendTimes
                 videoChampion = new Champion(name, orderedVideoPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
                 championsList.Add(videoChampion);
             }
+
+            // ToDo - this should go somewhere else to make it cleaner
+            var bestDays = 0;
+            var selectedName = "";
+            var selectedColor = "";
+            var timeOnline = 0D;
+            
+            foreach (var item in activeDataTuple.Item1)
+            {
+                var tempDays = item.Data.Count(x => x > 0);
+                
+                if (tempDays > bestDays)
+                {
+                    bestDays = tempDays;
+                    selectedName = item.Label;
+                    selectedColor = item.BackgroundColor;
+                    timeOnline = item.Data.Sum();
+                }
+                else if (tempDays == bestDays)
+                {
+                    var tempTime = item.Data.Sum();
+
+                    if (tempTime <= timeOnline) 
+                        continue;
+                    
+                    timeOnline = tempTime;
+                    bestDays = tempDays;
+                    selectedName = item.Label;
+                    selectedColor = item.BackgroundColor;
+                }
+            }
+            
+            championsList.Add(new Champion(selectedName, selectedColor, 0, 
+                $"{selectedName} is the Reckless Reliant Robin Rider",
+                $"The most reliable person in the last {originalDays}, with {bestDays} days active is {selectedName}, well done!",
+                $"{AchievementImageFolderUrl}/reliant-robin"));
 
             // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
             // ToDo - calculate the total time in millis
