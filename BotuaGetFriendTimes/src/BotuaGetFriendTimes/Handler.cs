@@ -14,6 +14,8 @@ namespace BotuaGetFriendTimes
 {
     public class Handler
     {
+        const string AchievementImageFolderUrl = "https://generic-images.s3.eu-west-2.amazonaws.com/achievement-images";
+
         private readonly ITimeRepository _timeRepository;
         private readonly INameHelper _nameHelper;
 
@@ -26,8 +28,8 @@ namespace BotuaGetFriendTimes
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
-            var days = int.Parse(input.QueryStringParameters["days"]);
-            days--;
+            var originalDays = int.Parse(input.QueryStringParameters["days"]);
+            var days = originalDays--;
 
             var millis = days * TimeHelper.DayLengthMillis;
 
@@ -98,43 +100,91 @@ namespace BotuaGetFriendTimes
             var streamingChampion = new Champion("", "", 0);
             var videoChampion = new Champion("", "", 0);
             var activeChampion = new Champion("", "", 0);
+
+            List<Champion> championsList = new List<Champion>();
             
+            if (activeDataTuple.Item2.Any())
+            {
+                var orderedActivePieData = activeDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+
+                var name = orderedActivePieData[0].Label;
+                var time = orderedActivePieData[0].Data[0];
+                var title = $"{name} is the champion :crown:";
+                var description = $"The most active user for the previous {originalDays} days was {name} with an active time of {time} hours what a champion!";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/active-time-champion.png";
+                
+                activeChampion = new Champion(name, orderedActivePieData[0].BackgroundColor, time, title, description, thumbnailUrl);
+                championsList.Add(activeChampion);
+            }
+            
+            if (deafenedDataTuple.Item2.Any())
+            {
+                var orderedDeafenedPieData = deafenedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                var name = orderedDeafenedPieData[0].Label;
+                var time = orderedDeafenedPieData[0].Data[0];
+
+                var title = $"{name} is the king of the squid people :squid:";
+                var description = $"{name}, with a deafened time of {time} hours in the previous {originalDays} days you were deafened so long that like the squid, you may as well have no ears!";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/deafened.png";
+                
+                deafenedChampion = new Champion(name, orderedDeafenedPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
+                championsList.Add(deafenedChampion);
+            }
             
             if (mutedDataTuple.Item2.Any())
             {
                 var orderedMutedPieData = mutedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-                mutedChampion = new Champion(orderedMutedPieData[0].Label, orderedMutedPieData[0].BackgroundColor, orderedMutedPieData[0].Data[0]);
-            }
-
-            if (deafenedDataTuple.Item2.Any())
-            {
+                var name = orderedMutedPieData[0].Label;
+                var time = orderedMutedPieData[0].Data[0];
                 
-                var orderedDeafenedPieData = deafenedDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-                deafenedChampion = new Champion(orderedDeafenedPieData[0].Label, orderedDeafenedPieData[0].BackgroundColor, orderedDeafenedPieData[0].Data[0]);
-            }
-            
-            if (afkDataTuple.Item2.Any())
-            {
-                var orderedAfkPieData = afkDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-                afkChampion = new Champion(orderedAfkPieData[0].Label, orderedAfkPieData[0].BackgroundColor, orderedAfkPieData[0].Data[0]);
+                var title = $"{name} is the new captain of the muted mutiny :pirate_flag:";
+                var description = $"With a muted time of {time} hours in the previous {originalDays} days we had no option but to promote {name} to the prestigious position of captain of the muted mutiny!";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/muted.png";
+                
+                mutedChampion = new Champion(name, orderedMutedPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
+                championsList.Add(mutedChampion);
             }
             
             if (streamingDataTuple.Item2.Any())
             {
                 var orderedStreamingPieData = streamingDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-                streamingChampion = new Champion(orderedStreamingPieData[0].Label, orderedStreamingPieData[0].BackgroundColor, orderedStreamingPieData[0].Data[0]);
+                var name = orderedStreamingPieData[0].Label;
+                var time = orderedStreamingPieData[0].Data[0];
+                
+                var title = $"{name} is the superior shark :shark:";
+                var description = $"With a streaming time of {time} hours in the previous {originalDays} days, like the mighty shark, normal streams could not hold your superiority, so {name} takes the title of Superior Shark - congratulations!";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/streaming.png";
+                
+                streamingChampion = new Champion(name, orderedStreamingPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
+                championsList.Add(streamingChampion);
             }
             
+            if (afkDataTuple.Item2.Any())
+            {
+                var orderedAfkPieData = afkDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
+                var name = orderedAfkPieData[0].Label;
+                var time = orderedAfkPieData[0].Data[0];
+                
+                var title = $"{name} is the leader of the sleeping sloths :sloth:";
+                var description = $"With {time} days away from keyboard in the last {originalDays} days, there's no question, {name} is the new leader of the sleeping sloths!";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/sloth.png";
+                
+                afkChampion = new Champion(name, orderedAfkPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
+                championsList.Add(afkChampion);
+            }
+
             if (videoDataTuple.Item2.Any())
             {
                 var orderedVideoPieData = videoDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-                videoChampion = new Champion(orderedVideoPieData[0].Label, orderedVideoPieData[0].BackgroundColor, orderedVideoPieData[0].Data[0]);
-            }
-            
-            if (activeDataTuple.Item2.Any())
-            {
-                var orderedActivePieData = activeDataTuple.Item2.OrderByDescending(x => x.Data[0]).ToList();
-                activeChampion = new Champion(orderedActivePieData[0].Label, orderedActivePieData[0].BackgroundColor, orderedActivePieData[0].Data[0]);
+                var name = orderedVideoPieData[0].Label;
+                var time = orderedVideoPieData[0].Data[0];
+                
+                var title = $"Viva la {name}, viva la Vlogger :video_camera:";
+                var description = $"Born to be a vlogger, your time on video of {time} hours in the previous {originalDays} days means {name} you are closer than anyone else to being a fully fledged vlogger!";
+                var thumbnailUrl = $"{AchievementImageFolderUrl}/video.png";
+                    
+                videoChampion = new Champion(name, orderedVideoPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
+                championsList.Add(videoChampion);
             }
 
             // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
@@ -152,7 +202,7 @@ namespace BotuaGetFriendTimes
             
             var champions = new Champions(activeChampion, mutedChampion, deafenedChampion, afkChampion, streamingChampion, videoChampion);
             
-            var charts = new Response(barGraph, pieChart, champions, activeChampion);
+            var charts = new Response(barGraph, pieChart, champions, activeChampion, championsList);
             
             var serialisedData = JsonSerializer.Serialize(charts);
             
