@@ -169,7 +169,7 @@ namespace BotuaGetFriendTimes
                 var time = orderedAfkPieData[0].Data[0];
                 
                 var title = $"{name} is the leader of the sleeping sloths :sloth:";
-                var description = $"With {time} days away from keyboard in the last {originalDays} days, there's no question, {name} is the new leader of the sleeping sloths!";
+                var description = $"With {time} hours away from keyboard in the last {originalDays} days, there's no question, {name} is the new leader of the sleeping sloths!";
                 var thumbnailUrl = $"{AchievementImageFolderUrl}/sloth-medal.png";
                 
                 afkChampion = new Champion(name, orderedAfkPieData[0].BackgroundColor, time, title, description, thumbnailUrl);
