@@ -12,8 +12,9 @@ namespace BotuaGetFriendTimes.Models
         public string Type { get; set; }
         public string Color { get; set; }
         public int Days { get; set; }
-
+        public int DaysActive { get; set; }
         public int Position { get; set; }
+
 
         private Dictionary<string, List<string>> _titles = new Dictionary<string, List<string>>();
 
@@ -47,6 +48,12 @@ namespace BotuaGetFriendTimes.Models
             ActiveTime = timeActive;
             return this;
         }
+        
+        public ChampionBuilder WithDaysActive(int daysActive)
+        {
+            DaysActive = daysActive;
+            return this;
+        }
 
         private string GetTitle()
         {
@@ -66,7 +73,7 @@ namespace BotuaGetFriendTimes.Models
                 "isAfk" => $"With {ActiveTime} hours away from keyboard in the last {Days} days, there's no question, {Name} is the new leader of the sleeping sloths!",
                 "isStreaming" => $"With a streaming time of {ActiveTime} hours in the previous {Days} days, like the mighty shark, normal streams could not hold your superiority, so {Name} takes the title of Superior Shark - congratulations!",
                 "isVideoOn" => $"Born to be a vlogger, your time on video of {ActiveTime} hours in the previous {Days} days means {Name} you are closer than anyone else to being a fully fledged vlogger!",
-                "isReliable" => $"The most reliable person in the last {Days} days, with {ActiveTime} days in a channel is {Name}, well done, you are undoubtedly the most reliable person - for now!",
+                "isReliable" => $"The most reliable person in the last {Days} days, with {DaysActive} days in a channel is {Name}, well done, you are undoubtedly the most reliable person - for now!",
                 "isActive" => $"The most active user for the previous {Days} days was {Name} with an active time of {ActiveTime} hours what a champion!",
                 _ => ""
             };

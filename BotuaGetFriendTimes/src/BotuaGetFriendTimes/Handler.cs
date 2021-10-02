@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -83,18 +84,20 @@ namespace BotuaGetFriendTimes
                 var barDataset = unsortedBarDataset.OrderByDescending(x => x.Data[0]).ToList();
                 
                 if (championType == "isReliable")
-                {
-                    pieDataset = CalculateIsReliableStat(barDataset);
-                }
-                
+                    pieDataset = pieDataset.OrderBy(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
+
                 if (pieDataset.Any())
                 {
-                    championsList.Add(new ChampionBuilder(originalDays)
-                        .WithName(pieDataset[0].Label)
-                        .WithColor(pieDataset[0].BackgroundColor)
-                        .WithType(championType)
-                        .WithTimeActive(pieDataset[0].Data[0])
-                        .Build());
+                    for (var i = 0; i < Math.Max(pieDataset.Count, 3); i++)
+                    {
+                        championsList.Add(new ChampionBuilder(originalDays)
+                            .WithName(pieDataset[i].Label)
+                            .WithColor(pieDataset[i].BackgroundColor)
+                            .WithType(championType)
+                            .WithTimeActive(pieDataset[i].Data[0])
+                            .WithDaysActive(pieDataset[i].DaysActive)
+                            .Build());
+                    }
                 }
                 
                 barDataDict.Add(championType, barDataset);

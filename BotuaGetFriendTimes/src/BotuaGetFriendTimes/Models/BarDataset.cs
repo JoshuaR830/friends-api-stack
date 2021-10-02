@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace BotuaGetFriendTimes.Models
@@ -21,6 +22,8 @@ namespace BotuaGetFriendTimes.Models
         public string BackgroundColor { get; set; }
         
         public string SelectedStat { get; set; }
+        
+        public int DaysActive { get; set; }
 
         public BarDataset(string label, List<double> data, string color, string selectedStat)
         {
@@ -30,6 +33,7 @@ namespace BotuaGetFriendTimes.Models
             StrokeColor = color;
             BackgroundColor = color;
             SelectedStat = selectedStat;
+            DaysActive = data.Count(x => x > 0);
         }
 
     }
