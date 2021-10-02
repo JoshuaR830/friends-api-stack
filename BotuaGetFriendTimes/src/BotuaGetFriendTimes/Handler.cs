@@ -71,12 +71,19 @@ namespace BotuaGetFriendTimes
             var pieDataDict = new Dictionary<string, List<BarDataset>>();
             var barDataDict = new Dictionary<string, List<BarDataset>>();
 
-            var championTypes = new List<string> {"isMuted", "isDeafened", "isAfk", "isStreaming", "isVideoOn", "isActive"};
+            var championTypes = new List<string> {"isActive", "isDeafened", "isMuted", "isStreaming", "isAfk", "isVideoOn", "isReliable"};
 
             foreach (var championType in championTypes)
             {
-                var (barDataset, pieDataset) = ProcessDatasets(championType, sortedData, dateData);
-
+                var (unsortedBarDataset, unsortedPieDataset) = ProcessDatasets(championType, sortedData, dateData);
+                var pieDataset = unsortedPieDataset.OrderByDescending(x => x.Data[0]).ToList();
+                var barDataset = unsortedBarDataset.OrderByDescending(x => x.Data[0]).ToList();
+                
+                if (championType == "isReliable")
+                {
+                    pieDataset = CalculateIsReliableStat(barDataset);
+                }
+                
                 if (pieDataset.Any())
                 {
                     championsList.Add(new ChampionBuilder(originalDays)
@@ -86,12 +93,44 @@ namespace BotuaGetFriendTimes
                         .WithTimeActive(pieDataset[0].Data[0])
                         .Build());
                 }
+                
                 barDataDict.Add(championType, barDataset);
                 pieDataDict.Add(championType, pieDataset);
             }
             
             var activeBarData = barDataDict["isActive"];
+            
+            
+            // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
+            // ToDo - calculate the total time in millis
+            // ToDo - see who has the largest number of millis
+            // ToDo - convert total time to hours
+            // ToDo - put the data into a champion
 
+
+            var barData = new BarData(barDateLabels, activeBarData);
+
+            var pieData = GeneratePieData(pieDataDict["isActive"]);
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
+            var barGraph = new BarGraph(barData);
+            
+            var charts = new Response(barGraph, pieChart, null, new Champion("", "", 0D), championsList);
+            
+            var serialisedData = JsonSerializer.Serialize(charts);
+            
+            // ToDo - work out the streak
+            // ToDo - work out the average
+            
+            return new APIGatewayProxyResponse
+            {
+                StatusCode = 200,
+                Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
+                Body = serialisedData
+            };
+        }
+
+        private List<BarDataset> CalculateIsReliableStat(List<BarDataset> activeBarData)
+        {
             // ToDo - this should go somewhere else to make it cleaner
             var bestDays = 0;
             var selectedName = "";
@@ -125,39 +164,10 @@ namespace BotuaGetFriendTimes
                     selectedColor = item.BackgroundColor;
                 }
             }
-
-            championsList.Add(new ChampionBuilder(originalDays)
-                .WithName(selectedName)
-                .WithColor(selectedColor)
-                .WithType("isReliable")
-                .WithTimeActive(bestDays)
-                .Build());
             
-            // ToDo - build a faster way to calculate - get all the time differences in millis for each session for each user
-            // ToDo - calculate the total time in millis
-            // ToDo - see who has the largest number of millis
-            // ToDo - convert total time to hours
-            // ToDo - put the data into a champion
-
-
-            var barData = new BarData(barDateLabels, activeBarData);
-
-            var pieData = GeneratePieData(pieDataDict["isActive"]);
-            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
-            var barGraph = new BarGraph(barData);
-            
-            var charts = new Response(barGraph, pieChart, null, new Champion("", "", 0D), championsList);
-            
-            var serialisedData = JsonSerializer.Serialize(charts);
-            
-            // ToDo - work out the streak
-            // ToDo - work out the average
-            
-            return new APIGatewayProxyResponse
+            return new List<BarDataset>
             {
-                StatusCode = 200,
-                Headers = new Dictionary<string, string> {{"Content-Type", "application/json"}},
-                Body = serialisedData
+                new BarDataset(selectedName, new List<double> {bestDays}, selectedColor, "isReliable")    
             };
         }
 
