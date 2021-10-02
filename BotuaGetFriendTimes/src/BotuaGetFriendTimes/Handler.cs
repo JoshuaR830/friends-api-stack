@@ -83,21 +83,22 @@ namespace BotuaGetFriendTimes
                 var pieDataset = unsortedPieDataset.OrderByDescending(x => x.Data[0]).ToList();
                 var barDataset = unsortedBarDataset.OrderByDescending(x => x.Data[0]).ToList();
                 
-                if (championType == "isReliable")
-                    pieDataset = pieDataset.OrderBy(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
+                // if (championType == "isReliable")
+                //     pieDataset = pieDataset.OrderBy(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
 
                 if (pieDataset.Any())
                 {
-                    for (var i = 0; i < Math.Max(pieDataset.Count, 3); i++)
-                    {
+                    var i = 0;
+                    // for (var i = 0; i < Math.Max(pieDataset.Count, 3); i++)
+                    // {
                         championsList.Add(new ChampionBuilder(originalDays)
                             .WithName(pieDataset[i].Label)
                             .WithColor(pieDataset[i].BackgroundColor)
                             .WithType(championType)
                             .WithTimeActive(pieDataset[i].Data[0])
-                            .WithDaysActive(pieDataset[i].DaysActive)
+                            // .WithDaysActive(pieDataset[i].DaysActive)
                             .Build());
-                    }
+                    // }
                 }
                 
                 barDataDict.Add(championType, barDataset);
