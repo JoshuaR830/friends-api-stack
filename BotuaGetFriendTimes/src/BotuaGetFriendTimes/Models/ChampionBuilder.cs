@@ -81,7 +81,7 @@ namespace BotuaGetFriendTimes.Models
                 "isAfk" => $"{AchievementImageFolderUrl}/sloth-medal.png",
                 "isStreaming" => $"{AchievementImageFolderUrl}/shark-medal.png",
                 "isVideoOn" => $"{AchievementImageFolderUrl}/video-medal.png",
-                "isReliable" => $"{AchievementImageFolderUrl}/reliant-robin-medal.png",
+                "isReliable" => $"{AchievementImageFolderUrl}/reliable-gold-medal.png",
                 "isActive" => $"{AchievementImageFolderUrl}/king-medal.png",
                 _ => ""
             };
@@ -123,15 +123,15 @@ namespace BotuaGetFriendTimes.Models
                 }},
                 {"isReliable", new List<string>
                 {
-                    $"{Name} is the reliable roman, leader of legions, ROAD BUILDER! No potholes here! :fire_engine:",
+                    $"{Name} is the reliable roman, leader of legions, ROAD BUILDER! No potholes here! :shield:",
                     $"{Name} is the reckless Reliant Robin rider :fire_engine:",
-                    $"{Name} is the porcupine at the puncture repair place :fire_engine:"
+                    $"{Name} is the porcupine at the puncture repair place :pushpin:"
                 }},
                 {"isActive", new List<string>
                 {
                     $"{Name} is the champion :crown:",
-                    $"{Name} is the princely person :crown:",
-                    $"{Name} is a lowly peasant :crown:",
+                    $"{Name} is the princely person :prince:",
+                    $"{Name} is a lowly peasant :farmer:",
                 }}
             };
             return new Champion(Name, Color, ActiveTime, GetTitle(), GetDescription(), GetThumbnailUrl());
