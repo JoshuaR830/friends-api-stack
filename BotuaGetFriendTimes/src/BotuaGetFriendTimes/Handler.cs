@@ -26,6 +26,11 @@ namespace BotuaGetFriendTimes
         
         public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest input)
         {
+            if (!input.MultiValueQueryStringParameters.TryGetValue("championTypes", out var championTypes))
+            {
+                championTypes = new List<string> {"isActive", "isDeafened", "isMuted", "isStreaming", "isAfk", "isVideoOn", "isReliable"};
+            }
+
             var originalDays = int.Parse(input.QueryStringParameters["days"]);
             var days = originalDays - 1;
             
@@ -70,8 +75,6 @@ namespace BotuaGetFriendTimes
 
             var pieDataDict = new Dictionary<string, List<BarDataset>>();
             var barDataDict = new Dictionary<string, List<BarDataset>>();
-
-            var championTypes = new List<string> {"isActive", "isDeafened", "isMuted", "isStreaming", "isAfk", "isVideoOn", "isReliable"};
 
             foreach (var championType in championTypes)
             {

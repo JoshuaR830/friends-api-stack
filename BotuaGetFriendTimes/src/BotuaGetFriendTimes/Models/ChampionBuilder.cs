@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BotuaGetFriendTimes.Models
 {
@@ -11,10 +12,15 @@ namespace BotuaGetFriendTimes.Models
         public string Type { get; set; }
         public string Color { get; set; }
         public int Days { get; set; }
-        
+
+        public int Position { get; set; }
+
+        private Dictionary<string, List<string>> _titles = new Dictionary<string, List<string>>();
+
         public ChampionBuilder(int days)
         {
             Days = days;
+            Position = 1;
         }
 
 
@@ -44,17 +50,11 @@ namespace BotuaGetFriendTimes.Models
 
         private string GetTitle()
         {
-            return Type switch
-            {
-                "isMuted" => $"{Name} is the new captain of the muted mutiny :pirate_flag:",
-                "isDeafened" => $"{Name} is the king of the squid people :squid:",
-                "isAfk" => $"{Name} is the leader of the sleeping sloths :sloth:",
-                "isStreaming" => $"{Name} is the superior shark :shark:",
-                "isVideoOn" => $"Viva la {Name}, viva la Vlogger :video_camera:",
-                "isReliable" => $"{Name} is the Reckless Reliant Robin Rider :fire_engine:",
-                "isActive" => $"{Name} is the champion :crown:",
-                _ => ""
-            };
+            List<string> titles;
+            if (!_titles.TryGetValue(Type, out titles))
+                return "";
+
+            return titles[Position - 1];
         }
 
         private string GetDescription()
@@ -89,6 +89,51 @@ namespace BotuaGetFriendTimes.Models
 
         public Champion Build()
         {
+            _titles = new Dictionary<string, List<string>>
+            {
+                {"isMuted", new List<string>
+                {
+                    $"{Name} is the new captain of the muted mutiny :pirate_flag:",
+                    $"{Name} is the new cabin person of the muted mutiny :pirate_flag:",
+                    $"{Name} is a peasantly crew member of the muted mutiny :pirate_flag:"
+                }},
+                {"isDeafened", new List<string>
+                {
+                    $"{Name} is the king of the squid people :squid:",
+                    $"{Name} is a princely squid person :squid:",
+                    $"{Name} is a lowly squid person :squid:"
+                }},
+                {"isAfk", new List<string>
+                {
+                    $"{Name} is the heroic leader of the sleeping sloths :sloth:",
+                    $"{Name} is the light sleeper of the sleeping sloths :sloth:",
+                    $"{Name} is the poor, tired watchmen of the sleeping sloths :sloth:"
+                }},
+                {"isStreaming", new List<string>
+                {
+                    $"{Name} is the superior shark :shark:",
+                    $"{Name} is the inferior shark :shark:",
+                    $"{Name} is the weak little fish that the superior shark shall devour :fishing_pole_and_fish:"
+                }},
+                {"isVideoOn", new List<string>
+                {
+                    $"Viva la {Name}, viva la vlogger :video_camera:",
+                    $"Viva la... oh, it would appear {Name} has lost vlogger viewership :video_camera:",
+                    $"Try harder {Name} or you'll never vive like a vlogger :video_camera:"
+                }},
+                {"isReliable", new List<string>
+                {
+                    $"{Name} is the reliable roman, leader of legions, ROAD BUILDER! No potholes here! :fire_engine:",
+                    $"{Name} is the reckless Reliant Robin rider :fire_engine:",
+                    $"{Name} is the porcupine at the puncture repair place :fire_engine:"
+                }},
+                {"isActive", new List<string>
+                {
+                    $"{Name} is the champion :crown:",
+                    $"{Name} is the princely person :crown:",
+                    $"{Name} is a lowly peasant :crown:",
+                }}
+            };
             return new Champion(Name, Color, ActiveTime, GetTitle(), GetDescription(), GetThumbnailUrl());
         }
     }
