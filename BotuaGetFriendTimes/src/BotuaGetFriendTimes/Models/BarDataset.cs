@@ -19,14 +19,18 @@ namespace BotuaGetFriendTimes.Models
         
         [JsonPropertyName("backgroundColor")]
         public string BackgroundColor { get; set; }
+        
+        public string SelectedStat { get; set; }
 
-        public BarDataset(string label, List<double> data, string color)
+        public BarDataset(string label, List<double> data, string color, string selectedStat)
         {
             Label = label;
             Data = data;
             FillColor = color;
             StrokeColor = color;
             BackgroundColor = color;
+            SelectedStat = selectedStat;
         }
+
     }
 }
