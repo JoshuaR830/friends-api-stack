@@ -86,7 +86,7 @@ namespace BotuaGetFriendTimes
 
                 if (championType == "isReliable")
                 {
-                    pieDataset = pieDataset.OrderByDescending(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
+                    pieDataset = pieDataset.OrderByDescending(x => x.DaysActive).ThenByDescending(x => x.Data[0]).ToList();
                 }
 
                 if (pieDataset.Any())
