@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -33,7 +34,13 @@ namespace BotuaGetFriendTimes.Models
             StrokeColor = color;
             BackgroundColor = color;
             SelectedStat = selectedStat;
+            Console.WriteLine($"Data for {label}: {data.Count}");
+            foreach (var d in data)
+            {
+                Console.WriteLine($"Point: {d}");
+            }
             DaysActive = data.Count(x => x > 0);
+            Console.WriteLine($"Days active {DaysActive}");
         }
 
     }
