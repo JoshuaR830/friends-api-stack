@@ -103,8 +103,8 @@ namespace BotuaGetFriendTimes.Models
                 {"isMuted", new List<string>
                 {
                     $"{Name} is the new captain of the muted mutiny :pirate_flag:",
-                    $"{Name} is the new cabin person of the muted mutiny :pirate_flag:",
-                    $"{Name} is a peasantly crew member of the muted mutiny :pirate_flag:"
+                    $"{Name} is the new young cabin person of the muted mutiny :child:",
+                    $"{Name} is a peasantly crew member of the muted mutiny :person_rowing_boat:"
                 }},
                 {"isDeafened", new List<string>
                 {
@@ -138,7 +138,7 @@ namespace BotuaGetFriendTimes.Models
                 }},
                 {"isActive", new List<string>
                 {
-                    $"{Name} is the champion :crown:",
+                    $"{Name} is the heroic champion :superhero:",
                     $"{Name} is the princely person :prince:",
                     $"{Name} is a lowly peasant :farmer:",
                 }}
@@ -200,7 +200,7 @@ namespace BotuaGetFriendTimes.Models
                 {
                     "isActive", new List<string>
                     {
-                        $"The most active user for the previous {Days} days was {Name} with an active time of {ActiveTime} hours what a champion!",
+                        $"{Name} our hero, the one who was here for us at all hours as long as it was in the {ActiveTime} hours that you were active in the last {Days} days - you're a champion!",
                         $"The second most active user for the previous {Days} days was {Name} with an active time of {ActiveTime} hours, the slightly inferior title of princely person belongs to you!",
                         $"In third place for active time for the previous {Days} days was {Name}, you got the not at all sought after title of lowly peasant attaining a peasantly active time of {ActiveTime} hours, you need to up your game!",
                     }
