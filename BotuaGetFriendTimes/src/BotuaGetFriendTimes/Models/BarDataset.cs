@@ -26,7 +26,7 @@ namespace BotuaGetFriendTimes.Models
         
         public int DaysActive { get; set; }
 
-        public BarDataset(string label, List<double> data, string color, string selectedStat)
+        public BarDataset(string label, List<double> data, string color, string selectedStat, int daysActive)
         {
             Label = label;
             Data = data;
@@ -34,13 +34,7 @@ namespace BotuaGetFriendTimes.Models
             StrokeColor = color;
             BackgroundColor = color;
             SelectedStat = selectedStat;
-            Console.WriteLine($"Data for {label}: {data.Count}");
-            foreach (var d in data)
-            {
-                Console.WriteLine($"Point: {d}");
-            }
-            DaysActive = data.Count(x => x > 0);
-            Console.WriteLine($"Days active {DaysActive}");
+            DaysActive = daysActive;
         }
 
     }

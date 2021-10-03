@@ -21,7 +21,7 @@ namespace BotuaGetFriendTimes.Models
         public ChampionBuilder(int days)
         {
             Days = days;
-            Position = 1;
+            Position = 0;
         }
 
 
@@ -55,13 +55,19 @@ namespace BotuaGetFriendTimes.Models
             return this;
         }
 
+        public ChampionBuilder WithZeroIndexedPosition(int position)
+        {
+            Position = position;
+            return this;
+        }
+
         private string GetTitle()
         {
             List<string> titles;
             if (!_titles.TryGetValue(Type, out titles))
                 return "";
 
-            return titles[Position - 1];
+            return titles[Position];
         }
 
         private string GetDescription()

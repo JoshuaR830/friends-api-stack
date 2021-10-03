@@ -83,9 +83,11 @@ namespace BotuaGetFriendTimes
                 var (unsortedBarDataset, unsortedPieDataset) = ProcessDatasets(championType, sortedData, dateData);
                 var pieDataset = unsortedPieDataset.OrderByDescending(x => x.Data[0]).ToList();
                 var barDataset = unsortedBarDataset.OrderByDescending(x => x.Data[0]).ToList();
-                
+
                 if (championType == "isReliable")
+                {
                     pieDataset = pieDataset.OrderByDescending(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
+                }
 
                 if (pieDataset.Any())
                 {
@@ -97,6 +99,7 @@ namespace BotuaGetFriendTimes
                             .WithType(championType)
                             .WithTimeActive(pieDataset[i].Data[0])
                             .WithDaysActive(pieDataset[i].DaysActive)
+                            .WithZeroIndexedPosition(i)
                             .Build());
                     }
                 }
@@ -174,7 +177,7 @@ namespace BotuaGetFriendTimes
             
             return new List<BarDataset>
             {
-                new BarDataset(selectedName, new List<double> {bestDays}, selectedColor, "isReliable")    
+                new BarDataset(selectedName, new List<double> {bestDays}, selectedColor, "isReliable", bestDays)    
             };
         }
 
@@ -270,12 +273,14 @@ namespace BotuaGetFriendTimes
                         userTimes.Add(hoursOnline);
                     }
                 }
+                
+                var daysActive = userTimes.Count(x => x > 0);
 
-                barDataset.Add(new BarDataset(_nameHelper.GetNameById(userId), userTimes, _nameHelper.GetColourById(userId), selectedStat));
+                barDataset.Add(new BarDataset(_nameHelper.GetNameById(userId), userTimes, _nameHelper.GetColourById(userId), selectedStat, daysActive));
 
                 barDataset = barDataset.OrderBy(x => x.Label).ToList();
 
-                preliminaryPieData.Add(new BarDataset(_nameHelper.GetNameById(userId), new List<double> {Math.Round(userTimes.Sum(), 2, MidpointRounding.AwayFromZero)}, _nameHelper.GetColourById(userId), selectedStat));
+                preliminaryPieData.Add(new BarDataset(_nameHelper.GetNameById(userId), new List<double> {Math.Round(userTimes.Sum(), 2, MidpointRounding.AwayFromZero)}, _nameHelper.GetColourById(userId), selectedStat, daysActive));
                 preliminaryPieData = preliminaryPieData.OrderBy(x => x.Label).ToList();
             }
 
