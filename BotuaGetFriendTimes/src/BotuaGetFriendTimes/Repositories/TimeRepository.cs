@@ -58,12 +58,8 @@ namespace BotuaGetFriendTimes.Repositories
                     var startTimestamp = item["StartTimestamp"].N;
                     var serverId = item["ServerId"].N;
                     var userId = item["UserId"].N;
-
-
-                    Console.WriteLine("About to get channel name");
                     
                     var channelName = GetStringValue(item, "ChannelName") ?? "";
-                    Console.WriteLine($"Channel name is {channelName}");
                     
                     var isAfk = TryConvertToBool(GetStringValue(item, "IsAfk"), false);
                     var isMuted = TryConvertToBool(GetStringValue(item, "IsMuted"), false);

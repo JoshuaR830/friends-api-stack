@@ -34,9 +34,6 @@ namespace BotuaGetFriendTimes
 
             var originalDays = int.Parse(input.QueryStringParameters["days"]);
             var days = originalDays - 1;
-            
-            Console.WriteLine($"Original days {originalDays}");
-            Console.WriteLine($"New days {days}");
 
             var millis = days * TimeHelper.DayLengthMillis;
 
@@ -45,9 +42,6 @@ namespace BotuaGetFriendTimes
             var endTime = TimeHelper.GetEndOfDayMillis(TimeHelper.ConvertToDateTime(currentMillis - TimeHelper.DayLengthMillis));
             var startTime = TimeHelper.GetStartOfDayMillis(TimeHelper.ConvertToDateTime(endTime - millis));
 
-            Console.WriteLine($"Start time {startTime}");
-            Console.WriteLine($"End time {endTime}");
-            
             var duration = "day";
 
             var dateData = TimeHelper.ConvertToDateStringRange(startTime, endTime);
@@ -57,7 +51,6 @@ namespace BotuaGetFriendTimes
             foreach (var dateInstance in dateData)
             {
                 barDateLabels.Add(dateInstance.DateString);
-                Console.WriteLine(dateInstance.DateString);
             }
 
             var rawTimeScan = (await _timeRepository.GetTimeByTimeRange(startTime, endTime)).ToList();
@@ -139,71 +132,11 @@ namespace BotuaGetFriendTimes
             };
         }
 
-        private List<BarDataset> CalculateIsReliableStat(List<BarDataset> activeBarData)
-        {
-            // ToDo - this should go somewhere else to make it cleaner
-            var bestDays = 0;
-            var selectedName = "";
-            var selectedColor = "";
-            var timeOnline = 0D;
-            
-            foreach (var item in activeBarData)
-            {
-                var tempDays = item.Data.Count(x => x > 0);
-                Console.WriteLine($"{item.Label} data:");
-                foreach(var thing in item.Data)
-                    Console.WriteLine(thing);
-                
-                if (tempDays > bestDays)
-                {
-                    bestDays = tempDays;
-                    selectedName = item.Label;
-                    selectedColor = item.BackgroundColor;
-                    timeOnline = item.Data.Sum();
-                }
-                else if (tempDays == bestDays)
-                {
-                    var tempTime = item.Data.Sum();
-
-                    if (tempTime <= timeOnline) 
-                        continue;
-                    
-                    timeOnline = tempTime;
-                    bestDays = tempDays;
-                    selectedName = item.Label;
-                    selectedColor = item.BackgroundColor;
-                }
-            }
-            
-            return new List<BarDataset>
-            {
-                new BarDataset(selectedName, new List<double> {bestDays}, selectedColor, "isReliable", bestDays)    
-            };
-        }
-
         private (List<BarDataset>, List<BarDataset>) ProcessDatasets(string selectedStat, SortedDataObject sortedData, List<DateData> dateData)
         {
             var specificTimeScan = DataForSelectedStat(selectedStat, sortedData).ToList();
             var timesTuple = GetTimesForData(specificTimeScan);
             return ProcessGraphData(GetUniqueUserIds(specificTimeScan), timesTuple.Item1, timesTuple.Item2, dateData, selectedStat);
-        }
-
-        private Champion GenerateChampion(List<BarDataset> data, int originalDays)
-        {
-            if (data.Any())
-            {
-                var orderedActivePieData = data.OrderByDescending(x => x.Data[0]).ToList();
-
-                var name = orderedActivePieData[0].Label;
-                var time = orderedActivePieData[0].Data[0];
-                var title = $"{name} is the champion :crown:";
-                var description = $"The most active user for the previous {originalDays} days was {name} with an active time of {time} hours what a champion!";
-                var thumbnailUrl = $"{AchievementImageFolderUrl}/king-medal.png";
-                
-                return new Champion(name, orderedActivePieData[0].BackgroundColor, time, title, description, thumbnailUrl);
-            }
-
-            return null;
         }
 
         public PieData GeneratePieData(List<BarDataset> preliminaryPieData)
@@ -229,11 +162,8 @@ namespace BotuaGetFriendTimes
             var barDataset = new List<BarDataset>();
             var preliminaryPieData = new List<BarDataset>();
 
-            Console.WriteLine($"Log user ID count: {userIds.Count}");
-            
             foreach (var userId in userIds)
             {
-                Console.WriteLine(userId);
                 var specificUserStartList = userStartTimeList[userId];
                 var specificUserEndList = userEndTimeList[userId];
 
@@ -254,8 +184,6 @@ namespace BotuaGetFriendTimes
                     var startTimesForToday = specificUserStartList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
                     var endTimesForToday = specificUserEndList.Where(x => x <= specificEndDay && x >= specificStartDay).ToList();
 
-                    Console.WriteLine($"Start: {startTimesForToday.Count}, End: {endTimesForToday.Count} Equal: {startTimesForToday.Count == endTimesForToday.Count}");
-
                     if (startTimesForToday.Count == endTimesForToday.Count)
                     {
                         var hoursOnline = 0d;
@@ -269,7 +197,6 @@ namespace BotuaGetFriendTimes
                             hoursOnline += TimeHelper.ConvertToHours(sessionTimeMillis);
                         }
                         
-                        Console.WriteLine($"Hours online {hoursOnline} stored");
                         userTimes.Add(hoursOnline);
                     }
                 }
@@ -365,5 +292,4 @@ namespace BotuaGetFriendTimes
             return (userStartTimeList, userEndTimeList);
         }
     }
-    
 }

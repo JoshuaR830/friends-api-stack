@@ -6,7 +6,7 @@ namespace BotuaGetFriendTimes.Models
     public class ChampionBuilder
     {
         const string AchievementImageFolderUrl = "https://generic-images.s3.eu-west-2.amazonaws.com/achievement-images";
-        
+
         public string Name { get; set; }
         public double ActiveTime { get; set; }
         public string Type { get; set; }
@@ -50,7 +50,7 @@ namespace BotuaGetFriendTimes.Models
             ActiveTime = timeActive;
             return this;
         }
-        
+
         public ChampionBuilder WithDaysActive(int daysActive)
         {
             DaysActive = daysActive;
@@ -82,7 +82,7 @@ namespace BotuaGetFriendTimes.Models
         private string GetThumbnailUrl()
         {
             var medalColour = (Position == 0 ? "gold" : (Position == 1 ? "silver" : "bronze"));
-            
+
             return Type switch
             {
                 "isMuted" => $"{AchievementImageFolderUrl}/muted-{medalColour}-medal.png",
@@ -100,48 +100,62 @@ namespace BotuaGetFriendTimes.Models
         {
             _titles = new Dictionary<string, List<string>>
             {
-                {"isMuted", new List<string>
                 {
-                    $"{Name} is the new captain of the muted mutiny :pirate_flag:",
-                    $"{Name} is the new young cabin person of the muted mutiny :child:",
-                    $"{Name} is a peasantly crew member of the muted mutiny :person_rowing_boat:"
-                }},
-                {"isDeafened", new List<string>
+                    "isMuted", new List<string>
+                    {
+                        $"{Name} is the new captain of the muted mutiny :pirate_flag:",
+                        $"{Name} is the new young cabin person of the muted mutiny :child:",
+                        $"{Name} is a peasantly crew member of the muted mutiny :person_rowing_boat:"
+                    }
+                },
                 {
-                    $"{Name} is the colossal squid, king of the ocean :crown:",
-                    $"{Name} is a baby squid :squid:",
-                    $"{Name} got inked by a squid :pen_fountain:"
-                }},
-                {"isAfk", new List<string>
+                    "isDeafened", new List<string>
+                    {
+                        $"{Name} is the colossal squid, king of the ocean :crown:",
+                        $"{Name} is a baby squid :squid:",
+                        $"{Name} got inked by a squid :pen_fountain:"
+                    }
+                },
                 {
-                    $"{Name} is the heroic leader of the sleeping sloth clan :zzz:",
-                    $"{Name} is the light sleeper of the sleeping sloth clan :sleeping:",
-                    $"{Name} is the poor, tired watchmen of the sleeping sloth clan :flashlight:"
-                }},
-                {"isStreaming", new List<string>
+                    "isAfk", new List<string>
+                    {
+                        $"{Name} is the heroic leader of the sleeping sloth clan :zzz:",
+                        $"{Name} is the light sleeper of the sleeping sloth clan :sleeping:",
+                        $"{Name} is the poor, tired watchmen of the sleeping sloth clan :flashlight:"
+                    }
+                },
                 {
-                    $"{Name} is the superior shark :shark:",
-                    $"{Name} is the inferior whimpering whale :whale:",
-                    $"{Name} is the weak little fish that the superior shark shall devour :fishing_pole_and_fish:"
-                }},
-                {"isVideoOn", new List<string>
+                    "isStreaming", new List<string>
+                    {
+                        $"{Name} is the superior shark :shark:",
+                        $"{Name} is the inferior whimpering whale :whale:",
+                        $"{Name} is the weak little fish that the superior shark shall devour :fishing_pole_and_fish:"
+                    }
+                },
                 {
-                    $"Viva la {Name}, viva la vlogger :video_camera:",
-                    $"Viva la... oh, it would appear {Name} has lost vlogger viewership :chart_with_downwards_trend:",
-                    $"{Name} is the viewerless vlogger , try harder or you'll never vive like a vlogger :ghost:"
-                }},
-                {"isReliable", new List<string>
+                    "isVideoOn", new List<string>
+                    {
+                        $"Viva la {Name}, viva la vlogger :video_camera:",
+                        $"Viva la... oh, it would appear {Name} has lost vlogger viewership :chart_with_downwards_trend:",
+                        $"{Name} is the viewerless vlogger , try harder or you'll never vive like a vlogger :ghost:"
+                    }
+                },
                 {
-                    $"{Name} is the reliable roman, leader of legions, ROAD BUILDER! No potholes here! :shield:",
-                    $"{Name} is the reckless Reliant Robin rider :fire_engine:",
-                    $"{Name} is the porcupine at the puncture repair place :pushpin:"
-                }},
-                {"isActive", new List<string>
+                    "isReliable", new List<string>
+                    {
+                        $"{Name} is the reliable roman, leader of legions, ROAD BUILDER! No potholes here! :shield:",
+                        $"{Name} is the reckless Reliant Robin rider :fire_engine:",
+                        $"{Name} is the porcupine at the puncture repair place :pushpin:"
+                    }
+                },
                 {
-                    $"{Name} is the heroic champion :superhero:",
-                    $"{Name} is the princely person :prince:",
-                    $"{Name} is a lowly peasant :farmer:",
-                }}
+                    "isActive", new List<string>
+                    {
+                        $"{Name} is the heroic champion :superhero:",
+                        $"{Name} is the princely person :prince:",
+                        $"{Name} is a lowly peasant :farmer:",
+                    }
+                }
             };
         }
 
