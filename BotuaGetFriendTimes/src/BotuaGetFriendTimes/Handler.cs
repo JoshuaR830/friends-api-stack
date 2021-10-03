@@ -69,6 +69,7 @@ namespace BotuaGetFriendTimes
                 .WithIsAfkItems(rawTimeScan.Where(x => x.IsAfk))
                 .WithIsStreamingItems(rawTimeScan.Where(x => x.IsStreaming))
                 .WithIsVideoOnItems(rawTimeScan.Where(x => x.IsVideoOn))
+                .WithIsReliableItems(rawTimeScan.Where(x => !x.IsAfk && !x.IsDeafened && !x.IsMuted))
                 .Build();
 
             List<Champion> championsList = new List<Champion>();
@@ -83,22 +84,21 @@ namespace BotuaGetFriendTimes
                 var pieDataset = unsortedPieDataset.OrderByDescending(x => x.Data[0]).ToList();
                 var barDataset = unsortedBarDataset.OrderByDescending(x => x.Data[0]).ToList();
                 
-                // if (championType == "isReliable")
-                //     pieDataset = pieDataset.OrderBy(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
+                if (championType == "isReliable")
+                    pieDataset = pieDataset.OrderBy(x => x.DaysActive).ThenBy(x => x.Data[0]).ToList();
 
                 if (pieDataset.Any())
                 {
-                    var i = 0;
-                    // for (var i = 0; i < Math.Max(pieDataset.Count, 3); i++)
-                    // {
+                    for (var i = 0; i < Math.Min(pieDataset.Count, 3); i++)
+                    {
                         championsList.Add(new ChampionBuilder(originalDays)
                             .WithName(pieDataset[i].Label)
                             .WithColor(pieDataset[i].BackgroundColor)
                             .WithType(championType)
                             .WithTimeActive(pieDataset[i].Data[0])
-                            // .WithDaysActive(pieDataset[i].DaysActive)
+                            .WithDaysActive(pieDataset[i].DaysActive)
                             .Build());
-                    // }
+                    }
                 }
                 
                 barDataDict.Add(championType, barDataset);
@@ -292,6 +292,7 @@ namespace BotuaGetFriendTimes
                 "isStreaming" => sortedData.IsStreamingItems,
                 "isVideoOn" => sortedData.IsVideoOnItems,
                 "isActive" => sortedData.ActiveTimeItems,
+                "isReliable" => sortedData.IsReliableItems,
                 _ => sortedData.ActiveTimeItems
             };
         }

@@ -11,6 +11,7 @@ namespace BotuaGetFriendTimes.Models
         private List<TimeItem> IsStreamingItems { get; set; }
         private List<TimeItem> IsVideoOnItems { get; set; }
         public List<TimeItem> ActiveTimeItems { get; set; }
+        public List<TimeItem> IsReliableItems { get; set; }
 
         public DataBuilder WithIsMutedItems(IEnumerable<TimeItem> mutedItems)
         {
@@ -47,10 +48,16 @@ namespace BotuaGetFriendTimes.Models
             ActiveTimeItems = activeItems.OrderBy(x => x.StartTimestamp).ToList();
             return this;
         }
+
+        public DataBuilder WithIsReliableItems(IEnumerable<TimeItem> reliableItems)
+        {
+            IsReliableItems = reliableItems.OrderBy(x => x.StartTimestamp).ToList();
+            return this;
+        }
         
         public SortedDataObject Build()
         {
-            return new SortedDataObject(IsMutedItems, IsDeafenedItems, IsAfkItems, IsStreamingItems, IsVideoOnItems, ActiveTimeItems);
+            return new SortedDataObject(IsMutedItems, IsDeafenedItems, IsAfkItems, IsStreamingItems, IsVideoOnItems, ActiveTimeItems, IsReliableItems);
         }
     }
 }

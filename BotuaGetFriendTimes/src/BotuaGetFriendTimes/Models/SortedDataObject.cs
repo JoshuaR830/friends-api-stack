@@ -11,10 +11,11 @@ namespace BotuaGetFriendTimes.Models
         public IEnumerable<TimeItem> IsStreamingItems { get; private set; }
         public IEnumerable<TimeItem> IsVideoOnItems { get; private set; }
         public IEnumerable<TimeItem> ActiveTimeItems { get; private set; }
+        public IEnumerable<TimeItem> IsReliableItems { get; set; }
 
 
         public SortedDataObject(IEnumerable<TimeItem> mutedItems, IEnumerable<TimeItem> deafenedItems,
-            IEnumerable<TimeItem> afkItems, IEnumerable<TimeItem> streamingItems, IEnumerable<TimeItem> videoItems, IEnumerable<TimeItem> activeItems)
+            IEnumerable<TimeItem> afkItems, IEnumerable<TimeItem> streamingItems, IEnumerable<TimeItem> videoItems, IEnumerable<TimeItem> activeItems, IEnumerable<TimeItem> reliableItems)
         {
             IsMutedItems = mutedItems;
             IsDeafenedItems = deafenedItems;
@@ -22,6 +23,7 @@ namespace BotuaGetFriendTimes.Models
             IsStreamingItems = streamingItems;
             IsVideoOnItems = videoItems;
             ActiveTimeItems = activeItems;
+            IsReliableItems = reliableItems;
         }
     }
 }
