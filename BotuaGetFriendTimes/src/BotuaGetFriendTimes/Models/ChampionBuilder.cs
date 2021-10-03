@@ -121,7 +121,7 @@ namespace BotuaGetFriendTimes.Models
                 {"isStreaming", new List<string>
                 {
                     $"{Name} is the superior shark :shark:",
-                    $"{Name} is the inferior whimpering :whale:",
+                    $"{Name} is the inferior whimpering whale :whale:",
                     $"{Name} is the weak little fish that the superior shark shall devour :fishing_pole_and_fish:"
                 }},
                 {"isVideoOn", new List<string>
