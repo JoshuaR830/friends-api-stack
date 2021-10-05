@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,8 +12,6 @@ namespace BotuaGetFriendTimes
 {
     public class Handler
     {
-        const string AchievementImageFolderUrl = "https://generic-images.s3.eu-west-2.amazonaws.com/achievement-images";
-
         private readonly ITimeRepository _timeRepository;
         private readonly INameHelper _nameHelper;
 
@@ -114,7 +111,8 @@ namespace BotuaGetFriendTimes
             var barData = new BarData(barDateLabels, activeBarData);
 
             var pieData = GeneratePieData(pieDataDict["isActive"]);
-            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false))));
+            var totalHours = pieData.Datasets.Sum(x => x.Data.Sum());
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false)), $"{totalHours} hours"));
             var barGraph = new BarGraph(barData);
             
             var charts = new Response(barGraph, pieChart, null, new Champion("", "", 0D), championsList);

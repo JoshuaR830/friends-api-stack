@@ -137,7 +137,7 @@ namespace BotuaGetFriendTimes.Models
                     {
                         $"Viva la {Name}, viva la vlogger :video_camera:",
                         $"Viva la... oh, it would appear {Name} has lost vlogger viewership :chart_with_downwards_trend:",
-                        $"{Name} is the viewerless vlogger , try harder or you'll never vive like a vlogger :ghost:"
+                        $"{Name} is the viewerless vlogger, try harder or you'll never vive like a vlogger :ghost:"
                     }
                 },
                 {
