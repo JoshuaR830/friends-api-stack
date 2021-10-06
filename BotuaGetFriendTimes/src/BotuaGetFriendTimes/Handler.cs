@@ -112,7 +112,7 @@ namespace BotuaGetFriendTimes
 
             var pieData = GeneratePieData(pieDataDict["isActive"]);
             var totalHours = pieData.Datasets.Sum(x => x.Data.Sum());
-            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false)), $"{totalHours} hours"));
+            var pieChart = new PieChart(pieData, new PieOptions(new PiePlugin(new PieDataLabels(false), new DoughnutLabel($"{totalHours} hours"))));
             var barGraph = new BarGraph(barData);
             
             var charts = new Response(barGraph, pieChart, null, new Champion("", "", 0D), championsList);

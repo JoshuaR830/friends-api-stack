@@ -8,13 +8,9 @@ namespace BotuaGetFriendTimes.Models
         [JsonPropertyName("plugins")]
         public PiePlugin Plugins { get; set; }
 
-        [JsonPropertyName("doughnutlabel")]
-        public DoughnutLabel DoughnutLabel { get; set; }
-
-        public PieOptions(PiePlugin plugins, string text)
+        public PieOptions(PiePlugin plugins)
         {
             Plugins = plugins;
-            DoughnutLabel = new DoughnutLabel(text);
         }
     }
 
@@ -46,9 +42,14 @@ namespace BotuaGetFriendTimes.Models
         [JsonPropertyName("datalabels")]
         public PieDataLabels DataLabels { get; set; }
         
-        public PiePlugin(PieDataLabels pieDataLabels)
+        
+        [JsonPropertyName("doughnutlabel")]
+        public DoughnutLabel DoughnutLabel { get; set; }
+        
+        public PiePlugin(PieDataLabels pieDataLabels, DoughnutLabel doughnutLabel)
         {
             DataLabels = pieDataLabels;
+            DoughnutLabel = doughnutLabel;
         }
     }
 
