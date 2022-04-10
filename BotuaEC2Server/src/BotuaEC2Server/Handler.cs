@@ -46,21 +46,6 @@ namespace BotuaEC2Server
                     } 
                 }
             });
-            
-            foreach(var reservations in requestedGameServerInstances.Reservations)
-            {
-                Console.WriteLine(JsonConvert.SerializeObject(reservations));
-                var state = reservations.Instances.Select(x => x.State.Name.Value.ToLower() == "running");
-                if (state.Any())
-                {
-                    return new APIGatewayProxyResponse
-                    {
-                        StatusCode = 200,
-                        Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
-                        Body = "Already running"
-                    };
-                }
-            }
 
             string s3Key;
             string instanceId;
@@ -83,6 +68,23 @@ namespace BotuaEC2Server
                     Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
                     Body = "Invalid game choice"
                 };
+            }
+
+            foreach (var reservations in requestedGameServerInstances.Reservations)
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(reservations));
+                var state = reservations.Instances.Where(x => x.State.Name.Value.ToLower() == "running");
+                Console.WriteLine($"Currently running: {state}");
+                Console.WriteLine($"Has any: {state.Any()}");
+                if (state.Any())
+                {
+                    return new APIGatewayProxyResponse
+                    {
+                        StatusCode = 200,
+                        Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
+                        Body = $"A {instanceId} server is already running, please play on that one!"
+                    };
+                }
             }
 
             var userDataObject = await _s3.GetObjectAsync("joshua-game-hosting", s3Key);
@@ -128,7 +130,7 @@ namespace BotuaEC2Server
             {
                 StatusCode = 200,
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } },
-                Body = $"{instanceId}"
+                Body = $"A {instanceId} has been started, it may be a few minutes until it is ready to play!"
             };
         }
     }

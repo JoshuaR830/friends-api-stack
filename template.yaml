@@ -21,7 +21,6 @@ Resources:
       Path: '/'
       ManagedPolicyArns:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
-      
 
   GetFriendImageFunction:
     Type: AWS::Lambda::Function
@@ -62,7 +61,6 @@ Resources:
       Runtime: dotnetcore3.1
       Timeout: 60
 
-
   BotuaGetFriendTimesFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -88,6 +86,32 @@ Resources:
       Role: !GetAtt GetFriendImageFunctionRole.Arn
       Runtime: dotnetcore3.1
       Timeout: 60
+  
+  BotuaEC2StopServerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: get-friend-image-functions
+        S3Key: BotuaStopEC2ServerFunctionFunctionCode
+      Description: Stop an EC2 server for specified game
+      FunctionName: BotuaStopEC2ServerFunction
+      Handler: BotuaStopEC2Server::BotuaStopEC2Server.Function::FunctionHandlerAsync
+      Role: !GetAtt GetFriendImageFunctionRole.Arn
+      Runtime: dotnetcore3.1
+      Timeout: 60
+
+  BotuaEventStopEC2ServerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: get-friend-image-functions
+        S3Key: BotuaEventStopEC2ServerFunctionFunctionCode
+      Description: Check if the EC2 server should be stopped on save event
+      FunctionName: BotuaEventStopEC2ServerFunction
+      Handler: BotuaEventStopEC2Server::BotuaEventStopEC2Server.Function::FunctionHandler
+      Role: !GetAtt GetFriendImageFunctionRole.Arn
+      Runtime: dotnetcore3.1
+      Timeout: 30
 
   GetFriendImageApiPermissions:
     Type: AWS::Lambda::Permission
@@ -127,6 +151,22 @@ Resources:
       Action: 'lambda:InvokeFunction'
       FunctionName: BotuaEC2ServerFunction
       Principal: 'apigateway.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
+
+  BotuaStopEC2ServerPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: BotuaStopEC2ServerFunction
+      Principal: 'apigateway.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
+
+  BotuaEventStopEC2ServerPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: BotuaEventStopEC2ServerFunction
+      Principal: 's3.amazonaws.com'
       SourceAccount: !Ref 'AWS::AccountId'
 
   GetFriendImageRestApi:
@@ -172,6 +212,13 @@ Resources:
     Properties:
       ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
       PathPart: 'game-server'
+      RestApiId: !Ref GetFriendImageRestApi
+
+  BotuaStopEC2ServerResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt GetFriendImageRestApi.RootResourceId
+      PathPart: 'stop-game-server'
       RestApiId: !Ref GetFriendImageRestApi
 
   GetFriendImageApiGatewayMethod:
@@ -255,6 +302,22 @@ Resources:
       ResourceId: !Ref BotuaEC2ServerResource
       RestApiId: !Ref GetFriendImageRestApi
 
+  BotuaStopEC2ServerApiGatewayUploadMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt GetFriendImageApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BotuaEC2StopServerFunction.Arn}/invocations'
+      ResourceId: !Ref BotuaStopEC2ServerResource
+      RestApiId: !Ref GetFriendImageRestApi
+
   GetFriendImageApiGatewayModel:
     Type: AWS::ApiGateway::Model
     Properties:
@@ -302,6 +365,7 @@ Resources:
                   - !GetAtt BotuaGetFriendTimesFunction.Arn
                   - !GetAtt BotuaFriendTimeFunction.Arn
                   - !GetAtt BotuaEC2ServerFunction.Arn
+                  - !GetAtt BotuaEC2StopServerFunction.Arn
 
   FriendImageTable:
     Type: AWS::DynamoDB::Table
@@ -336,6 +400,20 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       TableName: "FriendTimeTable"
+
+  FriendMetadataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "server_name"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        -
+          AttributeName: "server_name"
+          KeyType: "HASH"
+      TableName: "FriendMetadataTable"
 
   GetFriendImageFunctionRole:
     Type: AWS::IAM::Role
@@ -379,6 +457,7 @@ Resources:
                 Resource: 
                   - 'arn:aws:dynamodb:*:*:table/FriendImageTable'
                   - 'arn:aws:dynamodb:*:*:table/FriendTimeTable'
+                  - 'arn:aws:dynamodb:*:*:table/FriendMetadataTable'
         - PolicyName: AmazonS3FullAccess
           PolicyDocument:
             Version: 2012-10-17
@@ -390,6 +469,7 @@ Resources:
                   - 'arn:aws:s3:::Exchange-data-raw/*'
                   - 'arn:aws:s3:::generic-images/*'
                   - 'arn:aws:s3:::joshua-game-hosting/*'
+                  - 'arn:aws:s3:::joshua-game-backup/*'
         - PolicyName: ApiGatewayPermissions
           PolicyDocument:
             Version: 2012-10-17
