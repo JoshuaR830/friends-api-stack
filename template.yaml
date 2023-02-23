@@ -32,7 +32,7 @@ Resources:
       FunctionName: GetFriendImageFunction
       Handler: GetFriendImage::GetFriendImage.Function::FunctionHandlerAsync
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 60
 
   GetFriendImageUploadFunction:
@@ -45,7 +45,7 @@ Resources:
       FunctionName: GetFriendImageUploadFunction
       Handler: GetFriendImageUplaodFunction::GetFriendImageUploadFunction.Function::FunctionHandlerAsync
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 60
 
   BotuaFriendTimeFunction:
@@ -58,7 +58,7 @@ Resources:
       FunctionName: BotuaFriendTimeFunction
       Handler: BotuaFriendTime::BotuaFriendTime.Function::FunctionHandlerAsync
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 60
 
   BotuaGetFriendTimesFunction:
@@ -71,7 +71,7 @@ Resources:
       FunctionName: BotuaGetFriendTimesFunction
       Handler: BotuaGetFriendTimes::BotuaGetFriendTimes.Function::FunctionHandlerAsync
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 60
 
   BotuaEC2ServerFunction:
@@ -84,7 +84,7 @@ Resources:
       FunctionName: BotuaEC2ServerFunction
       Handler: BotuaEC2Server::BotuaEC2Server.Function::FunctionHandlerAsync
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 60
   
   BotuaEC2StopServerFunction:
@@ -97,7 +97,7 @@ Resources:
       FunctionName: BotuaStopEC2ServerFunction
       Handler: BotuaStopEC2Server::BotuaStopEC2Server.Function::FunctionHandlerAsync
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 60
 
   BotuaEventStopEC2ServerFunction:
@@ -110,7 +110,7 @@ Resources:
       FunctionName: BotuaEventStopEC2ServerFunction
       Handler: BotuaEventStopEC2Server::BotuaEventStopEC2Server.Function::FunctionHandler
       Role: !GetAtt GetFriendImageFunctionRole.Arn
-      Runtime: dotnetcore3.1
+      Runtime: dotnet6
       Timeout: 30
 
   GetFriendImageApiPermissions:
